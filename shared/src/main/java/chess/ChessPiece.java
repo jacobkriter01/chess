@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -50,13 +51,37 @@ public class ChessPiece {
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
      * danger
+     */
+
+    private void diagonal(ChessPosition origin, ChessPosition myPosition,int rowDirection, int colDirection, List<ChessMove> moves){
+        int row = myPosition.getRow() + rowDirection;
+        int col = myPosition.getColumn() + colDirection;
+
+        if (row > 8 || col > 8 || row < 1 || col < 1) {
+            return;
+        }
+
+        ChessPosition endPosition = new ChessPosition(row,col);
+        moves.add(new ChessMove(origin, endPosition, null));
+
+        diagonal(origin, endPosition,rowDirection,colDirection,moves);
+    }
+
+    /**
      *
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (getPieceType() == PieceType.BISHOP) {
-            return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+            List<ChessMove> moves = new ArrayList<>();
+
+            diagonal(myPosition, myPosition,1,1, moves); //up and right
+            diagonal(myPosition, myPosition,-1,1, moves); //down and right
+            diagonal(myPosition, myPosition,1,-1, moves); //up and left
+            diagonal(myPosition, myPosition,-1,-1, moves); // down and left
+
+            return moves;
         }
         return List.of();
     }
