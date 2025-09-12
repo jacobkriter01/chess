@@ -53,7 +53,7 @@ public class ChessPiece {
      * danger
      */
 
-    private void diagonal(ChessPosition origin, ChessPosition myPosition,int rowDirection, int colDirection, List<ChessMove> moves){
+    private void path(ChessBoard board, ChessPosition origin, ChessPosition myPosition,int rowDirection, int colDirection, List<ChessMove> moves, PieceType piece){
         int row = myPosition.getRow() + rowDirection;
         int col = myPosition.getColumn() + colDirection;
 
@@ -64,8 +64,11 @@ public class ChessPiece {
         ChessPosition endPosition = new ChessPosition(row,col);
         moves.add(new ChessMove(origin, endPosition, null));
 
-        diagonal(origin, endPosition,rowDirection,colDirection,moves);
+        if (piece == PieceType.QUEEN || piece == PieceType.BISHOP || piece == PieceType.ROOK) {
+            path(board, origin, endPosition, rowDirection, colDirection, moves, piece);
+        }
     }
+
 
     /**
      *
@@ -73,16 +76,49 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
+        List<ChessMove> moves = new ArrayList<>();
         if (getPieceType() == PieceType.BISHOP) {
-            List<ChessMove> moves = new ArrayList<>();
+            path(board, myPosition, myPosition,1,1, moves, getPieceType()); //up and right
+            path(board, myPosition, myPosition,-1,1, moves, getPieceType()); //down and right
+            path(board, myPosition, myPosition,1,-1, moves, getPieceType()); //up and left
+            path(board, myPosition, myPosition,-1,-1, moves, getPieceType()); //down and left
 
-            diagonal(myPosition, myPosition,1,1, moves); //up and right
-            diagonal(myPosition, myPosition,-1,1, moves); //down and right
-            diagonal(myPosition, myPosition,1,-1, moves); //up and left
-            diagonal(myPosition, myPosition,-1,-1, moves); // down and left
+            return moves;
+        } else if (getPieceType() == PieceType.ROOK) {
+            path(board, myPosition, myPosition,0,1, moves, getPieceType()); //right
+            path(board, myPosition, myPosition,-1,0, moves, getPieceType()); //down
+            path(board, myPosition, myPosition,1,0, moves, getPieceType()); //up
+            path(board, myPosition, myPosition,0,-1, moves, getPieceType()); //left
+
+            return moves;
+        }else if (getPieceType() == PieceType.QUEEN || getPieceType() == PieceType.KING) {
+            path(board, myPosition, myPosition,1,1, moves, getPieceType()); //up and right
+            path(board, myPosition, myPosition,-1,1, moves, getPieceType()); //down and right
+            path(board, myPosition, myPosition,1,-1, moves, getPieceType()); //up and left
+            path(board, myPosition, myPosition,-1,-1, moves, getPieceType()); // down and left
+
+            path(board, myPosition, myPosition,0,1, moves, getPieceType()); //right
+            path(board, myPosition, myPosition,-1,0, moves, getPieceType()); //down
+            path(board, myPosition, myPosition,1,0, moves, getPieceType()); //up
+            path(board, myPosition, myPosition,0,-1, moves, getPieceType()); //left
+
+            return moves;
+        }else if (getPieceType() == PieceType.KNIGHT) {
+            path(board, myPosition, myPosition,2,1, moves, getPieceType());
+            path(board, myPosition, myPosition,2,-1, moves, getPieceType());
+            path(board, myPosition, myPosition,-2,1, moves, getPieceType());
+            path(board, myPosition, myPosition,-2,-1, moves, getPieceType());
+            path(board, myPosition, myPosition,1,2, moves, getPieceType());
+            path(board, myPosition, myPosition,1,-2, moves, getPieceType());
+            path(board, myPosition, myPosition,-1,2, moves, getPieceType());
+            path(board, myPosition, myPosition,-1,-2, moves, getPieceType());
+
+            return moves;
+        }else if (getPieceType() == PieceType.PAWN) {
+
 
             return moves;
         }
-        return List.of();
+        return moves;
     }
 }
