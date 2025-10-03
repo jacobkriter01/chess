@@ -27,6 +27,11 @@ public class ChessBoard {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
+    public void movePiece(ChessMove move) {
+        board[move.getEndPosition().getRow()-1][move.getEndPosition().getColumn()-1] = getPiece(move.getStartPosition());
+        board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn()-1] =  null;
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
@@ -36,6 +41,22 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board[position.getRow()-1][position.getColumn()-1];
+    }
+
+    public ChessBoard cloneBoard(){
+        ChessBoard newBoard = new ChessBoard();
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = getPiece(position);
+
+                if(piece != null){
+                    newBoard.addPiece(position, piece);
+                }
+            }
+        }
+        return newBoard;
     }
 
     /**
@@ -92,22 +113,81 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        String boardBuilder = "";
+
+        for(int row = 1; row <= 8; row++){
+            for(int col = 1; col <= 8; col++){
+                boardBuilder += "|";
+                if(getPiece(new ChessPosition(row, col)) == null) {
+                    boardBuilder += " |";
+                }else {
+                    if (getPiece(new ChessPosition(row, col)).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
+                            boardBuilder += "K|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.QUEEN) {
+                            boardBuilder += "Q|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.BISHOP) {
+                            boardBuilder += "B|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.ROOK) {
+                            boardBuilder += "R|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                            boardBuilder += "N|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.PAWN) {
+                            boardBuilder += "P|";
+                        }
+                    }else {
+                        if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KING) {
+                            boardBuilder += "k|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.QUEEN) {
+                            boardBuilder += "q|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.BISHOP) {
+                            boardBuilder += "b|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.ROOK) {
+                            boardBuilder += "r|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                            boardBuilder += "n|";
+                        } else if (getPiece(new ChessPosition(row, col)).getPieceType() == ChessPiece.PieceType.PAWN) {
+                            boardBuilder += "p|";
+                        }
+                    }
+                }
+//                boardBuilder +="\n";
+            }
+        }
+        return boardBuilder;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (this == o) return true;
+        if (!(o instanceof ChessBoard)) return false;
+
+        ChessBoard other = (ChessBoard) o;
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece thisPiece = this.getPiece(pos);
+                ChessPiece otherPiece = other.getPiece(pos);
+
+                if (thisPiece == null && otherPiece == null) continue;
+                if (thisPiece == null || otherPiece == null) return false;
+                if (!thisPiece.equals(otherPiece)) return false;
+            }
         }
-        ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(board);
+        int result = 17;
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = this.getPiece(pos);
+                result = 31 * result + (piece == null ? 0 : piece.hashCode());
+            }
+        }
+        return result;
     }
 }

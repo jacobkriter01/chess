@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -9,12 +11,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private final ChessBoard board;
-    public TeamColor color;
+    private ChessBoard board;
+    private TeamColor turn;
 
-    public ChessGame(ChessBoard board, TeamColor color) {
-        this.board = board;
-        this.color = color;
+    public ChessGame() {
+        this.board = new ChessBoard();
+        this.board.resetBoard();
+        this.turn = TeamColor.WHITE;
 
     }
 
@@ -22,7 +25,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return color;
+        return turn;
     }
 
     /**
@@ -31,7 +34,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        color = team;
+        turn = team;
     }
 
     /**
@@ -50,14 +53,28 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        ChessPiece piece = board.getPiece(startPosition);
 
-       
-//        Collection<ChessMove> piecemoves(board, startPosition);
+        if (piece == null) {
+            return null;
+        }
 
-        throw new UnsupportedOperationException("Not supported yet.");
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
-        // I think I broke my commits oops
+        Collection<ChessMove> legalMoves = new ArrayList<>();
 
+        for (ChessMove move : moves) {
+            ChessBoard copy = board.cloneBoard();
+
+            copy.movePiece(move);
+
+            legalMoves.add(move);
+
+            // check for check and other things
+
+        }
+
+        return legalMoves;
     }
 
     /**
@@ -72,7 +89,7 @@ public class ChessGame {
         if (piece == null) {
             throw new InvalidMoveException("No piece at start position");
         }
-        if (piece.getTeamColor() != color) {
+        if (piece.getTeamColor() != turn) {
             throw new InvalidMoveException("Not this teams turn");
         }
 
@@ -82,8 +99,10 @@ public class ChessGame {
             throw new InvalidMoveException("Move not valid");
         }
 
+        board.movePiece(move);
 
-        color = (color == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+        turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
     }
 
@@ -124,7 +143,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        board = board;
+        this.board = board;
     }
 
     /**
@@ -134,5 +153,27 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+//    @Override
+//    public String toString() {
+//        return "ChessGame{" +
+//                "board=" + board +
+//                ", turn=" + turn +
+//                '}';
+//    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && turn == chessGame.turn;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, turn);
     }
 }

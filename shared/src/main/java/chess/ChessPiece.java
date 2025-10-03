@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -199,7 +198,7 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type && Objects.equals(moves, that.moves);
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
