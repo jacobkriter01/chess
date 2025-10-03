@@ -70,13 +70,10 @@ public class ChessGame {
             copy.movePiece(move);
 
             // check for check
-            if (piece.getPieceType() == ChessPiece.PieceType.KING){
-                if (!isCopyInCheck(piece.getTeamColor(), copy)){
-                    legalMoves.add(move);
-                }
-            } else {
+            if (!isCopyInCheck(piece.getTeamColor(), copy)){
                 legalMoves.add(move);
             }
+
 
         }
 
@@ -151,7 +148,7 @@ public class ChessGame {
 
     public boolean isCopyInCheck(TeamColor teamColor, ChessBoard copy) {
         //find the teamColor king
-        ChessPosition kingLocation = board.findKing(teamColor);
+        ChessPosition kingLocation = copy.findKing(teamColor);
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
