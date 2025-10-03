@@ -75,6 +75,7 @@ public class ChessGame {
             }
 
 
+
         }
 
         return legalMoves;
@@ -97,7 +98,7 @@ public class ChessGame {
         }
 
         if(isInCheck(getTeamTurn())){
-            if(move.getStartPosition() != board.findKing(getTeamTurn())) {
+            if(!move.getStartPosition().equals(board.findKing(getTeamTurn()))) {
                 throw new InvalidMoveException("King is already in check");
             }
         }
@@ -126,23 +127,18 @@ public class ChessGame {
         //find the teamColor king
         ChessPosition kingLocation = board.findKing(teamColor);
 
-        Collection<ChessMove> kingHunter = new ArrayList<>();
-
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                if (board.getPiece(new ChessPosition(i, j)) != null) {
-                    if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != teamColor) {
-                        kingHunter = validMoves(new ChessPosition(i, j));
-                        for (ChessMove move : kingHunter) {
-                            if (move.getEndPosition().equals(kingLocation)) {
-                                return true;
-                            }
+                ChessPiece kingHunter = board.getPiece(new ChessPosition(i, j));
+                if (kingHunter != null && kingHunter.getTeamColor() != teamColor) {
+                    for (ChessMove move : kingHunter.pieceMoves(board, new ChessPosition(i, j))) {
+                        if (move.getEndPosition().equals(kingLocation)) {
+                            return true;
                         }
                     }
                 }
             }
         }
-
         return false;
     }
 
@@ -152,7 +148,7 @@ public class ChessGame {
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                ChessPiece enemy =copy.getPiece(new ChessPosition(i, j));
+                ChessPiece enemy = copy.getPiece(new ChessPosition(i, j));
                 if (enemy != null && enemy.getTeamColor() != teamColor) {
                    for  (ChessMove move : enemy.pieceMoves(copy, new ChessPosition(i, j))) {
                        if (move.getEndPosition().equals(kingLocation)) {
