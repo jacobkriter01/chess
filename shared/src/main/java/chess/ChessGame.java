@@ -13,12 +13,13 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor turn;
+    private ArrayList<ChessMove> gameLog;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.turn = TeamColor.WHITE;
-
+        this.gameLog = new ArrayList<>();
     }
 
     /**
@@ -93,6 +94,12 @@ public class ChessGame {
             throw new InvalidMoveException("Not this teams turn");
         }
 
+        if(isInCheck(getTeamTurn())){
+            if(move.getStartPosition() != board.findKing(getTeamTurn())) {
+                throw new InvalidMoveException("King is already in check");
+            }
+        }
+
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
 
         if (!moves.contains(move)) {
@@ -100,6 +107,7 @@ public class ChessGame {
         }
 
         board.movePiece(move);
+        gameLog.add(move);
 
 
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
@@ -113,7 +121,27 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //find the teamColor king
+        ChessPosition kingLocation = board.findKing(teamColor);
+
+        Collection<ChessMove> kingHunter = new ArrayList<>();
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (board.getPiece(new ChessPosition(i, j)) != null) {
+                    if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != teamColor) {
+                        kingHunter = validMoves(new ChessPosition(i, j));
+                        for (ChessMove move : kingHunter) {
+                            if (move.getEndPosition().equals(kingLocation)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
