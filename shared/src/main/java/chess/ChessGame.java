@@ -113,6 +113,10 @@ public class ChessGame {
             throw new InvalidMoveException("King is already in checkmate");
         }
 
+        if(isInStalemate(getTeamTurn())){
+            throw new InvalidMoveException("Game is stalemate");
+        }
+
         board.movePiece(move);
         gameLog.add(move);
 
@@ -120,9 +124,7 @@ public class ChessGame {
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
 
-//        }else if(isInStalemate(getTeamTurn())){
-//            throw new InvalidMoveException("Game is stalemate");
-//        }
+
 
     }
 
@@ -204,7 +206,22 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(isInCheck(teamColor)){
+            return false;
+        }
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = validMoves(new ChessPosition(i, j));
+                    if(moves != null && !moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -225,13 +242,13 @@ public class ChessGame {
         return board;
     }
 
-//    @Override
-//    public String toString() {
-//        return "ChessGame{" +
-//                "board=" + board +
-//                ", turn=" + turn +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "board=" + board +
+                ", turn=" + turn +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {
