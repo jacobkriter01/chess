@@ -1,9 +1,21 @@
 package service;
+import dataaccess.DataAccess;
 import datamodel.UserData;
 import datamodel.RegisterResponse;
 
 public class UserService {
-    public RegisterResponse register(UserData user){
+    private final DataAccess dataAccess;
+
+    public UserService(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+    public RegisterResponse register(UserData user) throws Exception {
+        var extinguisher = dataAccess.getUser(user.username());
+        if(extinguisher != null){
+            throw new Exception("User already exists");
+        }
+
+        dataAccess.addUser(user);
         return new RegisterResponse(user.username(), "zyz");
     }
 }
