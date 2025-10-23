@@ -10,6 +10,10 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
     public RegisterResponse register(UserData user) throws Exception {
+        if(user == null || user.username() == null || user.password() == null){
+            throw new IllegalArgumentException("Missing Required Fields");
+        }
+
         var extinguisher = dataAccess.getUser(user.username());
         if(extinguisher != null){
             throw new Exception("User already exists");
@@ -18,4 +22,6 @@ public class UserService {
         dataAccess.addUser(user);
         return new RegisterResponse(user.username(), "zyz");
     }
+
+
 }
