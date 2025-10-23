@@ -71,17 +71,15 @@ public class Server {
 
     public void logout(Context ctx){
         var serializer = new Gson();
-
         try{
-        var token = serializer.fromJson(ctx.body(), AuthTokenData.class);
-        if(token.authToken() == null || token.authToken().isEmpty()){
+            AuthTokenData tokenData = serializer.fromJson(ctx.body(), AuthTokenData.class);
+        if(tokenData == null || tokenData.authToken() == null || tokenData.authToken().isEmpty()) {
             ctx.status(401).result("{ \"message\": \"Error: %s\"}");
             return;
         }
 
-
-            String logoutResponse = userService.logout(token.authToken());
-            ctx.status(200).result(serializer.toJson(logoutResponse);
+            userService.logout(tokenData.authToken());
+            ctx.status(200).result("{}");
         } catch (Exception ex){
             ctx.status(401).result("{ \"message\": \"Error: %s\"}");
         }
