@@ -3,10 +3,13 @@ import dataaccess.DataAccess;
 import datamodel.UserData;
 import datamodel.RegisterResponse;
 import datamodel.AuthTokenData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final DataAccess dataAccess;
 
     public UserService(DataAccess dataAccess) {
@@ -23,7 +26,11 @@ public class UserService {
         }
 
         dataAccess.addUser(user);
-        return new RegisterResponse(user.username(), "zyz");
+
+        var token = new AuthTokenData(UUID.randomUUID().toString(), user.username());
+        dataAccess.addAuthToken(token);
+
+        return new RegisterResponse(user.username(), token.authToken());
     }
 
     public AuthTokenData login(UserData user) throws Exception {

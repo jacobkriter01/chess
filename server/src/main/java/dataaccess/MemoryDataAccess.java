@@ -1,6 +1,7 @@
 package dataaccess;
 
 import datamodel.AuthTokenData;
+import datamodel.GameData;
 import datamodel.UserData;
 
 import java.util.HashMap;
@@ -8,6 +9,8 @@ import java.util.HashMap;
 public class MemoryDataAccess implements DataAccess {
     private HashMap<String, UserData> users = new HashMap<>();
     private HashMap<String, AuthTokenData> authTokens = new HashMap<>();
+    private HashMap<Integer, GameData> games = new HashMap<>();
+    private int nextId = 0;
 
     @Override
     public void clear() {
@@ -37,6 +40,23 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void removeAuthToken(String token) {
         authTokens.remove(token);
+    }
+
+    public GameData addGame(String gameName, String creator) {
+        GameData game = new GameData(nextId++, gameName, creator);
+        games.put(game.id(), game);
+        return game;
+    }
+
+    public GameData getGame(int gameId) {
+        return games.get(gameId);
+    }
+
+    public void joinGame(int id, String username) {
+        GameData game = games.get(id);
+        if (game != null) {
+            game.addPlayer(username);
+        }
     }
 
 }

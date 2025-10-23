@@ -70,20 +70,29 @@ public class Server {
     }
 
     public void logout(Context ctx){
-        var serializer = new Gson();
-        try{
-            AuthTokenData tokenData = serializer.fromJson(ctx.body(), AuthTokenData.class);
-        if(tokenData == null || tokenData.authToken() == null || tokenData.authToken().isEmpty()) {
-            ctx.status(401).result("{ \"message\": \"Error: %s\"}");
-            return;
-        }
+        try {
+            var header = ctx.header("Authorization");
 
-            userService.logout(tokenData.authToken());
-            ctx.status(200).result("{}");
-        } catch (Exception ex){
-            ctx.status(401).result("{ \"message\": \"Error: %s\"}");
+            if(header == null || header.isEmpty()){
+                ctx.status(401).result("{ \"message\": \"Error: Missing auth token\" }");
+            }
+
+            var token = header.startsWith("Bearer ") ? header.substring(7) : header;
+
+            userService.logout(token);
+            ctx.result("{}");
+        } catch (Exception ex) {
+            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }
     }
+
+//    public void createGame(Context ctx){
+//        var serializer = new Gson();
+//        try{
+//            var token = ctx.header("authorization:");
+//
+//        }
+//    }
 
     public int run(int desiredPort) {
         server.start(desiredPort);
