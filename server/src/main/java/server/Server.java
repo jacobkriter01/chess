@@ -71,13 +71,12 @@ public class Server {
 
     public void logout(Context ctx){
         try {
-            var header = ctx.header("Authorization");
+            var token = ctx.header("Authorization");
 
-            if(header == null || header.isEmpty()){
+            if(token == null || token.isEmpty()){
                 ctx.status(401).result("{ \"message\": \"Error: Missing auth token\" }");
             }
 
-            var token = header.startsWith("Bearer ") ? header.substring(7) : header;
 
             userService.logout(token);
             ctx.result("{}");
