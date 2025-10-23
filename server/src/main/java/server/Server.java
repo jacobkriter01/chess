@@ -7,15 +7,18 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
 import service.UserService;
+import service.GameService;
 
 public class Server {
 
     private final Javalin server;
     private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
 
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -24,8 +27,8 @@ public class Server {
         server.post("user", this::register);
         server.post("session", this::login);
         server.delete("session", this::logout);
-
-
+        server.post("game", this::createGame);
+        server.put("game", this::joinGame);
 
     }
 
@@ -77,7 +80,6 @@ public class Server {
                 ctx.status(401).result("{ \"message\": \"Error: Missing auth token\" }");
             }
 
-
             userService.logout(token);
             ctx.result("{}");
         } catch (Exception ex) {
@@ -85,13 +87,33 @@ public class Server {
         }
     }
 
-//    public void createGame(Context ctx){
-//        var serializer = new Gson();
-//        try{
-//            var token = ctx.header("authorization:");
-//
-//        }
-//    }
+    public void createGame(Context ctx){
+        var serializer = new Gson();
+        try{
+            var token = ctx.header("Authorization");
+            var body = serializer.fromJson(ctx.body(), java.util.Map.class);
+            var name = (String)body.get("gameName");
+            if(name == null){
+                ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+                return;
+            }
+            var game = gameService.createGame(token, name);
+            ctx.status(200).result("{ \"gameID\": " + game.id() + "}");
+        }catch (Exception ex){
+            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }
+    }
+
+    public void joinGame(Context ctx){
+        try{
+            var token = ctx.header("Authorization");
+            var id =  Integer.parseInt(ctx.pathParam("gameID"));
+            gameService.joinGame(token, id);
+            ctx.status(200).result("{}");
+        } catch (Exception ex){
+            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }
+    }
 
     public int run(int desiredPort) {
         server.start(desiredPort);
