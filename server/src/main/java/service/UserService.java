@@ -23,5 +23,11 @@ public class UserService {
         return new RegisterResponse(user.username(), "zyz");
     }
 
-
+    public RegisterResponse login(UserData user) throws Exception {
+        var existingUser = dataAccess.getUser(user.username());
+        if(existingUser == null || !existingUser.password().equals(user.password())){
+            throw new Exception("unauthorized");
+        }
+        return new RegisterResponse(user.username(), "zyz");
+    }
 }

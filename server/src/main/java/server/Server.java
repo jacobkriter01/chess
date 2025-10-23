@@ -21,6 +21,7 @@ public class Server {
 
         server.delete("db", ctx -> ctx.result("{}"));
         server.post("user", this::register);
+        server.post("session", this::login);
 
 
 
@@ -40,6 +41,29 @@ public class Server {
         }catch (Exception ex) {
             var errorMessage = String.format("{ \"message\": \"Error: %s\"}", ex.getMessage());
             ctx.status(403).result(errorMessage);
+        }
+    }
+
+    public void login(Context ctx){
+        var serializer = new Gson();
+        try{
+            var user = serializer.fromJson(ctx.body(), UserData.class);
+
+            if(user.username() == null  || user.password() == null){
+                ctx.status(400).result("{ \"message\": \"Error: %s\"}");
+                return;
+            }
+
+            var loginResponse = userService.login(user);
+            ctx.status(200).result(serializer.toJson(loginResponse));
+        }catch (Exception ex){
+            String errorMessage = ex.getMessage();
+            if(errorMessage.equals("unauthorized")){
+                ctx.status(401).result("{ \"message\": \"Error: %s\"}");
+            } else {
+                ctx.status(400).result("{ \"message\": \"Error: %s\"}");
+            }
+
         }
     }
 
