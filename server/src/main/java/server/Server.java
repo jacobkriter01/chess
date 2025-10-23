@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.MemoryDataAccess;
+import datamodel.AuthTokenData;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -22,6 +23,7 @@ public class Server {
         server.delete("db", ctx -> ctx.result("{}"));
         server.post("user", this::register);
         server.post("session", this::login);
+        server.delete("session", this::logout);
 
 
 
@@ -64,6 +66,24 @@ public class Server {
                 ctx.status(400).result("{ \"message\": \"Error: %s\"}");
             }
 
+        }
+    }
+
+    public void logout(Context ctx){
+        var serializer = new Gson();
+
+        try{
+        var token = serializer.fromJson(ctx.body(), AuthTokenData.class);
+        if(token.authToken() == null || token.authToken().isEmpty()){
+            ctx.status(401).result("{ \"message\": \"Error: %s\"}");
+            return;
+        }
+
+
+            String logoutResponse = userService.logout(token.authToken());
+            ctx.status(200).result(serializer.toJson(logoutResponse);
+        } catch (Exception ex){
+            ctx.status(401).result("{ \"message\": \"Error: %s\"}");
         }
     }
 

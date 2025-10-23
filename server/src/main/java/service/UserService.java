@@ -2,6 +2,9 @@ package service;
 import dataaccess.DataAccess;
 import datamodel.UserData;
 import datamodel.RegisterResponse;
+import datamodel.AuthTokenData;
+
+import java.util.UUID;
 
 public class UserService {
     private final DataAccess dataAccess;
@@ -23,11 +26,23 @@ public class UserService {
         return new RegisterResponse(user.username(), "zyz");
     }
 
-    public RegisterResponse login(UserData user) throws Exception {
+    public AuthTokenData login(UserData user) throws Exception {
         var existingUser = dataAccess.getUser(user.username());
         if(existingUser == null || !existingUser.password().equals(user.password())){
             throw new Exception("unauthorized");
         }
-        return new RegisterResponse(user.username(), "zyz");
+
+        var token = new AuthTokenData(UUID.randomUUID().toString(), user.username());
+        dataAccess.addAuthToken(token);
+
+        return token;
+    }
+
+    public void logout(String token) throws Exception {
+        var auth = dataAccess.getAuthToken(token);
+        if (auth == null){
+            throw new Exception("Invalid token");
+        }
+        dataAccess.removeAuthToken(token);
     }
 }
