@@ -3,7 +3,7 @@ package service;
 import dataaccess.MemoryDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
-import exceptions.AlreadyTakenExcpetion;
+import exceptions.AlreadyTakenException;
 import exceptions.BadRequestException;
 import exceptions.ServiceException;
 import exceptions.UnauthorizedException;
@@ -38,20 +38,23 @@ public class GameService {
         }
 
         String username = auth.username();
-
+        if(color == null || color.isEmpty()) {
+            throw new BadRequestException();
+        }
         if (color.equalsIgnoreCase("WHITE")){
             if (game.whiteUsername() != null && !game.whiteUsername().isEmpty()){
-                throw new AlreadyTakenExcpetion();
+                throw new AlreadyTakenException();
             }
-            game.setWhiteUsername(username);
         }else if (color.equalsIgnoreCase("BLACK")){
             if (game.blackUsername() != null && !game.blackUsername().isEmpty()){
-                throw new AlreadyTakenExcpetion();
+                throw new AlreadyTakenException();
             }
-            game.setBlackUsername(username);
         }else {
             throw new BadRequestException();
         }
+
+
+        dataAccess.joinGame(gameID, username, color);
     }
 
     public java.util.Collection<GameData> listGames(String token) throws ServiceException {

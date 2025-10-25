@@ -1,8 +1,5 @@
 package datamodel;
 
-import java.util.Set;
-import java.util.HashSet;
-
 public class GameData {
     private int id;
     private String name;
@@ -12,8 +9,8 @@ public class GameData {
     public GameData(int id, String name, String creator) {
         this.id = id;
         this.name = name;
-        this.whiteUsername = "";
-        this.blackUsername = "";
+        this.whiteUsername = null;
+        this.blackUsername = null;
     }
 
     public int id(){
@@ -32,7 +29,7 @@ public class GameData {
     public void setWhiteUsername(String whiteUsername){
         this.whiteUsername = whiteUsername;
     }
-    public void setBlackUsername(String BlackUsername){
+    public void setBlackUsername(String blackUsername){
         this.blackUsername = blackUsername;
     }
 }

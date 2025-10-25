@@ -118,6 +118,10 @@ public class Server {
         try{
             var token  = ctx.header("Authorization");
             var body = serializer.fromJson(ctx.body(), java.util.Map.class);
+            if (body.get("gameID") == null || body.get("playerColor") == null){
+                ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+                return;
+            }
             var playerColor = (String)body.get("playerColor");
             var gameID = ((Double)body.get("gameID")).intValue();
 
