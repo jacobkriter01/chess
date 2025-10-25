@@ -2,12 +2,14 @@ package server;
 
 import dataaccess.MemoryDataAccess;
 import datamodel.AuthTokenData;
+import datamodel.GameData;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
 import service.UserService;
 import service.GameService;
+import exceptions.ServiceException;
 
 public class Server {
 
@@ -105,13 +107,36 @@ public class Server {
     }
 
     public void joinGame(Context ctx){
+        var serializer = new Gson();
+        try{
+            var token  = ctx.header("Authorization");
+            var body = serializer.fromJson(ctx.body(), java.util.Map.class);
+            var playerColor = (String)body.get("playerColor");
+            var gameID = ((Double)body.get("gameID")).intValue();
+
+            gameService.joinGame(token, gameID, playerColor);
+            ctx.status(200).result("{}");
+
+        } catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        } catch (Exception ex){
+            ctx.status(500).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }
+    }
+
+    public void listGames(Context ctx){
+        var serializer = new Gson();
         try{
             var token = ctx.header("Authorization");
-            var id =  Integer.parseInt(ctx.pathParam("gameID"));
-            gameService.joinGame(token, id);
-            ctx.status(200).result("{}");
+            var games = gameService.listGames(token);
+            var response =  new java.util.HashMap<String, Object>();
+            response.put("games", games);
+            ctx.status(200).result(serializer.toJson(response));
+
+        } catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         } catch (Exception ex){
-            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+            ctx.status(500).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }
     }
 

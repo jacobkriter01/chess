@@ -6,14 +6,14 @@ import java.util.HashSet;
 public class GameData {
     private int id;
     private String name;
-    private String creator;
-    private Set<String> players = new HashSet<>();
+    private String whiteUsername;
+    private String blackUsername;
 
     public GameData(int id, String name, String creator) {
         this.id = id;
         this.name = name;
-        this.creator = creator;
-        this.players.add(creator);
+        this.whiteUsername = "";
+        this.blackUsername = "";
     }
 
     public int id(){
@@ -22,14 +22,17 @@ public class GameData {
     public String name(){
         return name;
     }
-    public String creator(){
-        return creator;
+    public String whiteUsername(){
+        return whiteUsername;
     }
-    public Set<String> players(){
-        return players;
+    public String blackUsername(){
+        return blackUsername;
     }
 
-    public void addPlayer(String username){
-        players.add(username);
+    public void setWhiteUsername(String whiteUsername){
+        this.whiteUsername = whiteUsername;
+    }
+    public void setBlackUsername(String BlackUsername){
+        this.blackUsername = blackUsername;
     }
 }

@@ -3,6 +3,10 @@ package service;
 import dataaccess.MemoryDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
+import exceptions.AlreadyTakenExcpetion;
+import exceptions.BadRequestException;
+import exceptions.ServiceException;
+import exceptions.UnauthorizedException;
 
 public class GameService {
     private final MemoryDataAccess dataAccess;
@@ -11,19 +15,44 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public GameData createGame(String token, String gameName) throws Exception{
+    public GameData createGame(String token, String gameName) throws ServiceException{
         AuthTokenData auth = dataAccess.getAuthToken(token);
         if(auth == null){
-            throw new Exception("unauthorized");
+            throw new UnauthorizedException();
+        }
+        if (gameName == null || gameName.isEmpty()){
+            throw new BadRequestException();
         }
         return dataAccess.addGame(gameName, auth.username());
     }
 
-    public void joinGame(String token, int gameID) throws Exception{
+    public void joinGame(String token, int gameID, String color) throws ServiceException {
         AuthTokenData auth = dataAccess.getAuthToken(token);
-        if(auth == null){
-            throw new Exception("unauthorized");
+        if (auth == null){
+            throw new UnauthorizedException();
         }
-        dataAccess.joinGame(gameID, auth.username());
+
+        GameData game = dataAccess.getGame(gameID);
+        if (game == null){
+            throw new BadRequestException();
+        }
+
+        String username = auth.username();
+
+        if (color.equalsIgnoreCase("WHITE")){
+            if (game.whiteUsername() != null && !game.whiteUsername().isEmpty()){
+                throw new AlreadyTakenExcpetion();
+            }
+            game.setWhiteUsername(username);
+        }else if (color.equalsIgnoreCase("BLACK")){
+            if (game.blackUsername() != null && !game.blackUsername().isEmpty()){
+                throw new AlreadyTakenExcpetion();
+            }
+            game.setBlackUsername(username);
+        }else {
+            throw new BadRequestException();
+        }
+
+
     }
 }
