@@ -15,6 +15,9 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void clear() {
         users.clear();
+        authTokens.clear();
+        games.clear();
+        nextId = 1;
     }
 
     @Override
@@ -33,7 +36,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public AuthTokenData getAuthToken(String token){
+    public AuthTokenData getAuthToken(String token) {
         return authTokens.get(token);
     }
 
@@ -52,4 +55,7 @@ public class MemoryDataAccess implements DataAccess {
         return games.get(gameId);
     }
 
+    public java.util.Collection<GameData> getAllGames() {
+        return games.values();
+    }
 }

@@ -52,7 +52,14 @@ public class GameService {
         }else {
             throw new BadRequestException();
         }
+    }
 
+    public java.util.Collection<GameData> listGames(String token) throws ServiceException {
+        AuthTokenData auth = dataAccess.getAuthToken(token);
+        if (auth == null){
+            throw new UnauthorizedException();
+        }
 
+        return dataAccess.getAllGames();
     }
 }

@@ -16,22 +16,29 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
+    private final MemoryDataAccess dataAccess;
 
     public Server() {
-        var dataAccess = new MemoryDataAccess();
+        dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
 
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", this::clearDatabase);
         server.post("user", this::register);
         server.post("session", this::login);
         server.delete("session", this::logout);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
+        server.get("game", this::listGames);
 
+    }
+
+    private void clearDatabase(Context ctx) {
+        dataAccess.clear();
+        ctx.status(200).result("{}");
     }
 
     private void register(Context ctx) { //handler
