@@ -20,9 +20,15 @@ public class GameData {
         return name;
     }
     public String whiteUsername(){
+        if(whiteUsername == null){
+            return "";
+        }
         return whiteUsername;
     }
     public String blackUsername(){
+        if(blackUsername == null){
+            return "";
+        }
         return blackUsername;
     }
 
