@@ -141,13 +141,14 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPiece kingHunter = board.getPiece(new ChessPosition(i, j));
-                if (kingHunter != null && kingHunter.getTeamColor() != teamColor) {
-                    for (ChessMove move : kingHunter.pieceMoves(board, new ChessPosition(i, j))) {
-                        if (move.getEndPosition().equals(kingLocation)) {
-                            return true;
-                        }
+                if (kingHunter == null || kingHunter.getTeamColor() == teamColor) {
+                    continue;
+                }for (ChessMove move : kingHunter.pieceMoves(board, new ChessPosition(i, j))) {
+                    if (move.getEndPosition().equals(kingLocation)) {
+                        return true;
                     }
                 }
+
             }
         }
         return false;
@@ -160,13 +161,14 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPiece enemy = copy.getPiece(new ChessPosition(i, j));
-                if (enemy != null && enemy.getTeamColor() != teamColor) {
-                   for  (ChessMove move : enemy.pieceMoves(copy, new ChessPosition(i, j))) {
-                       if (move.getEndPosition().equals(kingLocation)) {
-                           return true;
-                       }
-                   }
+                if (enemy == null || enemy.getTeamColor() == teamColor) {
+                    continue;
                 }
+               for  (ChessMove move : enemy.pieceMoves(copy, new ChessPosition(i, j))) {
+                   if (move.getEndPosition().equals(kingLocation)) {
+                       return true;
+                   }
+               }
             }
         }
 
