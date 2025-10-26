@@ -167,7 +167,9 @@ public class ChessBoard {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ChessBoard)) return false;
+        if (!(o instanceof ChessBoard)){
+            return false;
+        }
 
         ChessBoard other = (ChessBoard) o;
 
@@ -177,9 +179,15 @@ public class ChessBoard {
                 ChessPiece thisPiece = this.getPiece(pos);
                 ChessPiece otherPiece = other.getPiece(pos);
 
-                if (thisPiece == null && otherPiece == null) continue;
-                if (thisPiece == null || otherPiece == null) return false;
-                if (!thisPiece.equals(otherPiece)) return false;
+                if (thisPiece == null && otherPiece == null){
+                    continue;
+                }
+                if (thisPiece == null || otherPiece == null){
+                    return false;
+                }
+                if (!thisPiece.equals(otherPiece)) {
+                    return false;
+                }
             }
         }
         return true;
