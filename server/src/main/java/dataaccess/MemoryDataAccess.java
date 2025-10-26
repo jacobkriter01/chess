@@ -51,8 +51,8 @@ public class MemoryDataAccess implements DataAccess {
         return game;
     }
 
-    public void joinGame(int ID, String username, String color) {
-        GameData game = games.get(ID);
+    public void joinGame(int gameID, String username, String color) {
+        GameData game = games.get(gameID);
         if (game == null) {
             return;
         }

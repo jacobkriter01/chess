@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.UUID;
 
 public class UserService {
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private final DataAccess dataAccess;
 
     public UserService(DataAccess dataAccess) {
