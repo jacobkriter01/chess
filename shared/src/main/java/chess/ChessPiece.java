@@ -4,12 +4,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
 
-/**
- * Represents a single chess piece
- * <p>
- * Note: You can add to this class, but you may not alter
- * signature of the existing methods.
- */
+
 public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
