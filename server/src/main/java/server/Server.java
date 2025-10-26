@@ -49,9 +49,8 @@ public class Server {
 
             ctx.result(serializer.toJson(registrationResponse));
 
-        }catch (IllegalArgumentException ex){
-            var errorMessage = String.format("{ \"message\": \"Error: %s\"}", ex.getMessage());
-            ctx.status(400).result(errorMessage);
+        }catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }catch (Exception ex) {
             var errorMessage = String.format("{ \"message\": \"Error: %s\"}", ex.getMessage());
             ctx.status(403).result(errorMessage);
@@ -107,7 +106,7 @@ public class Server {
                 return;
             }
             var game = gameService.createGame(token, name);
-            ctx.status(200).result("{ \"gameID\": " + game.id() + "}");
+            ctx.status(200).result("{ \"gameID\": " + game.getGameID() + "}");
         }catch (Exception ex){
             ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }

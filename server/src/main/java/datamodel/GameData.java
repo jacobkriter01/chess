@@ -1,36 +1,35 @@
 package datamodel;
 
 public class GameData {
-    private int id;
-    private String name;
+    private int gameID;
+    private String gameName;
     private String whiteUsername;
     private String blackUsername;
+//    private Object game;
 
-    public GameData(int id, String name, String creator) {
-        this.id = id;
-        this.name = name;
-        this.whiteUsername = null;
-        this.blackUsername = null;
+    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername, Object game) {
+        this.gameID = gameID;
+        this.gameName = gameName;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
+//        this.game = game;
     }
 
-    public int id(){
-        return id;
+    public int getGameID(){
+        return gameID;
     }
-    public String name(){
-        return name;
+    public String getGameName(){
+        return gameName;
     }
-    public String whiteUsername(){
-        if(whiteUsername == null){
-            return "";
-        }
+    public String getWhiteUsername(){
         return whiteUsername;
     }
-    public String blackUsername(){
-        if(blackUsername == null){
-            return "";
-        }
+    public String getBlackUsername(){
         return blackUsername;
     }
+//    public Object game(){
+//        return game;
+//    }
 
     public void setWhiteUsername(String whiteUsername){
         this.whiteUsername = whiteUsername;
@@ -38,4 +37,7 @@ public class GameData {
     public void setBlackUsername(String blackUsername){
         this.blackUsername = blackUsername;
     }
+//    public void setGame(Object game){
+//        this.game = game;
+//    }
 }

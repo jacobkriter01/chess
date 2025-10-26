@@ -45,9 +45,9 @@ public class MemoryDataAccess implements DataAccess {
         authTokens.remove(token);
     }
 
-    public GameData addGame(String gameName, String creator) {
-        GameData game = new GameData(nextId++, gameName, creator);
-        games.put(game.id(), game);
+    public GameData addGame(String gameName) {
+        GameData game = new GameData(nextId++, gameName, null, null, null);
+        games.put(game.getGameID(), game);
         return game;
     }
 

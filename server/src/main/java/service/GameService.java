@@ -23,7 +23,7 @@ public class GameService {
         if (gameName == null || gameName.isEmpty()){
             throw new BadRequestException();
         }
-        return dataAccess.addGame(gameName, auth.username());
+        return dataAccess.addGame(gameName);
     }
 
     public void joinGame(String token, int gameID, String color) throws ServiceException {
@@ -42,11 +42,11 @@ public class GameService {
             throw new BadRequestException();
         }
         if (color.equalsIgnoreCase("WHITE")){
-            if (game.whiteUsername() != null && !game.whiteUsername().isEmpty()){
+            if (game.getWhiteUsername() != null && !game.getWhiteUsername().isEmpty()){
                 throw new AlreadyTakenException();
             }
         }else if (color.equalsIgnoreCase("BLACK")){
-            if (game.blackUsername() != null && !game.blackUsername().isEmpty()){
+            if (game.getBlackUsername() != null && !game.getBlackUsername().isEmpty()){
                 throw new AlreadyTakenException();
             }
         }else {
