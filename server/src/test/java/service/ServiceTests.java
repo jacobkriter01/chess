@@ -1,13 +1,10 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
-import datamodel.AuthTokenData;
 import datamodel.GameData;
 import datamodel.UserData;
-import datamodel.RegisterResponse;
 import exceptions.*;
 
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +47,7 @@ public class ServiceTests {
     }
 
     @Test
-    void failBadUser() throws ServiceException {
+    void failBadUser() {
         assertThrows(BadRequestException.class, () -> userService.register(new UserData(null,"jacob@mail", "pwd")));
     }
 
@@ -83,7 +80,7 @@ public class ServiceTests {
     }
 
     @Test
-    void logoutFail() throws ServiceException {
+    void logoutFail() {
         assertThrows(UnauthorizedException.class, () -> userService.logout("fake token"));
     }
 
@@ -100,7 +97,7 @@ public class ServiceTests {
     }
 
     @Test
-    void createGameFailUnauth() throws ServiceException {
+    void createGameFailUnauth(){
         assertThrows(UnauthorizedException.class, () -> gameService.createGame("fake token", "test game"));
     }
 
@@ -132,7 +129,7 @@ public class ServiceTests {
     }
 
     @Test
-    void joinGameFailUnauth() throws ServiceException {
+    void joinGameFailUnauth(){
         assertThrows(UnauthorizedException.class, () -> gameService.joinGame("bad token", 123, "WHITE"));
     }
 
@@ -162,7 +159,7 @@ public class ServiceTests {
     }
 
     @Test
-    void listGamesFailUnauth() throws ServiceException {
+    void listGamesFailUnauth(){
         assertThrows(UnauthorizedException.class, () -> gameService.listGames("bad token"));
     }
 }
