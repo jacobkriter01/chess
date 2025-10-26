@@ -57,44 +57,22 @@ public class ChessPiece {
         int row = origin.getRow() + rowDir;
         int col = origin.getColumn();
 
-        if(col > 1 && col < 8) {
-            if(board.getPiece(new ChessPosition(row, col - 1)) != null) { //left
-                if(board.getPiece(new ChessPosition(row, col - 1)).getTeamColor() != board.getPiece(origin).getTeamColor()) {
-                    if (row == 8 || row == 1){
-                        pPromotion(origin, new ChessPosition(row, col - 1), moves);
-                    } else{
-                        moves.add(new ChessMove(origin, new ChessPosition(row, col - 1), null));
-                    }
+        for(int colOffset : new int[]{-1, 1}){
+            int newCol = col + colOffset;
 
-                }
+            if(newCol < 1 || newCol > 8 || row < 1 || row > 8){
+                continue;
             }
-            if(board.getPiece(new ChessPosition(row, col + 1)) != null) { //right
-                if(board.getPiece(new ChessPosition(row, col + 1)).getTeamColor() != board.getPiece(origin).getTeamColor()) {
-                    if (row == 8 || row == 1){
-                        pPromotion(origin, new ChessPosition(row, col + 1), moves);
-                    } else {
-                        moves.add(new ChessMove(origin, new ChessPosition(row, col + 1), null));
-                    }
-                }
-            }
-        } else if(col > 1) {
-            if(board.getPiece(new ChessPosition(row, col - 1)) != null) { //left
-                if(board.getPiece(new ChessPosition(row, col - 1)).getTeamColor() != board.getPiece(origin).getTeamColor()) {
-                    if (row == 8 || row == 1){
-                        pPromotion(origin, new ChessPosition(row, col - 1), moves);
-                    } else {
-                        moves.add(new ChessMove(origin, new ChessPosition(row, col - 1), null));
-                    }
-                }
-            }
-        } else if(col < 8) {
-            if(board.getPiece(new ChessPosition(row, col + 1)) != null) { //right
-                if(board.getPiece(new ChessPosition(row, col + 1)).getTeamColor() != board.getPiece(origin).getTeamColor()) {
-                    if (row == 8 || row == 1){
-                        pPromotion(origin, new ChessPosition(row, col + 1), moves);
-                    } else {
-                        moves.add(new ChessMove(origin, new ChessPosition(row, col + 1), null));
-                    }
+
+            ChessPosition targetPosition = new ChessPosition(row, newCol);
+            ChessPiece targetPiece = board.getPiece(targetPosition);
+            ChessPiece currentPiece = board.getPiece(origin);
+
+            if (targetPiece != null && targetPiece.getTeamColor() != currentPiece.getTeamColor()){
+                if (row == 8 || row == 1){
+                    pPromotion(origin, targetPosition, moves);
+                } else {
+                    moves.add(new ChessMove(origin, targetPosition, null));
                 }
             }
         }
