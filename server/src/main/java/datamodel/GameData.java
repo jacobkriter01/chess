@@ -7,7 +7,7 @@ public class GameData {
     private String blackUsername;
 //    private Object game;
 
-    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername, Object game) {
+    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;

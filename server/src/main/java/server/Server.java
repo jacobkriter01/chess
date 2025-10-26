@@ -1,8 +1,6 @@
 package server;
 
 import dataaccess.MemoryDataAccess;
-import datamodel.AuthTokenData;
-import datamodel.GameData;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
