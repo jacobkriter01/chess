@@ -69,7 +69,8 @@ public class ChessBoard {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 if(getPiece(new ChessPosition(i, j)) != null){
-                    if(getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor && getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING){
+                    ChessPiece piece = getPiece(new ChessPosition(i, j));
+                    if(piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING){
                        kingLocation = new ChessPosition(i, j);
                     }
                 }
