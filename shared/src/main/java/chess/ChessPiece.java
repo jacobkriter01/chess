@@ -171,10 +171,16 @@ public class ChessPiece {
                 rowDir = -1;
             }
 
-            if((myPosition.getRow() == 2 || myPosition.getRow() == 7) && board.getPiece(new ChessPosition(myPosition.getRow() + rowDir, myPosition.getColumn())) == null) {
+            int row = myPosition.getRow();
+            int col = myPosition.getColumn();
+            ChessPosition nextPosition = new ChessPosition(row + rowDir, col);
+            boolean isStartRow = (row == 2 || row == 7);
+            boolean isPathClear = board.getPiece(nextPosition) == null;
+
+            if(isStartRow && isPathClear) {
                 path(board, myPosition, myPosition, rowDir, 0, moves);
                 pCapture(board, myPosition, rowDir, moves);
-                path(board, myPosition, new ChessPosition(myPosition.getRow() + rowDir, myPosition.getColumn()), rowDir, 0, moves);
+                path(board, myPosition, nextPosition, rowDir, 0, moves);
             }else{
                 path(board, myPosition, myPosition, rowDir, 0, moves);
                 pCapture(board, myPosition, rowDir, moves);
