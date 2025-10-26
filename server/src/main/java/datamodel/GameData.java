@@ -5,14 +5,12 @@ public class GameData {
     private String gameName;
     private String whiteUsername;
     private String blackUsername;
-//    private Object game;
 
     public GameData(int gameID, String gameName, String whiteUsername, String blackUsername) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
-//        this.game = game;
     }
 
     public int getGameID(){
@@ -27,17 +25,10 @@ public class GameData {
     public String getBlackUsername(){
         return blackUsername;
     }
-//    public Object game(){
-//        return game;
-//    }
-
     public void setWhiteUsername(String whiteUsername){
         this.whiteUsername = whiteUsername;
     }
     public void setBlackUsername(String blackUsername){
         this.blackUsername = blackUsername;
     }
-//    public void setGame(Object game){
-//        this.game = game;
-//    }
 }
