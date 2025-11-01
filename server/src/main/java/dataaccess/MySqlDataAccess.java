@@ -103,7 +103,17 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public void addAuthToken(AuthTokenData authToken) {
-
+        var sql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
+        try(var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)){
+            ps.setString(1, authToken.authToken());
+            ps.setString(2, authToken.authToken());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't add auth token",e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
