@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import datamodel.AuthTokenData;
+import datamodel.GameData;
 import datamodel.UserData;
 import exceptions.*;
 
@@ -63,7 +64,16 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public void clear() {
-
+        try(var conn = DatabaseManager.getConnection();
+            var stmt = conn.createStatement()){
+            stmt.executeUpdate("TRUNCATE TABLE auth_tokens");
+            stmt.executeUpdate("TRUNCATE TABLE users");
+            stmt.executeUpdate("TRUNCATE TABLE games");
+        } catch (SQLException e){
+            throw new RuntimeException("Unable to clear tables.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -105,7 +115,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
     public void addAuthToken(AuthTokenData authToken) {
         var sql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
         try(var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(sql)){
+            var ps = conn.prepareStatement(sql)){
             ps.setString(1, authToken.authToken());
             ps.setString(2, authToken.authToken());
             ps.executeUpdate();
@@ -148,4 +158,27 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             throw new RuntimeException(e);
         }
     }
+
+
+    public GameData addGame(String gameName) {
+        var sql = "INSERT INTO games (gameName) VALUES (?)";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql, RETURN_GENERATED_KEYS)){
+            ps.setString(1, gameName);
+            ps.executeUpdate();
+            try(var rs = ps.getGeneratedKeys()){
+                if(rs.next()){
+                    int id = rs.getInt(1);
+                    return new GameData(id, gameName, null, null);
+                }
+            }
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to add game.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
 }
+
