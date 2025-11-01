@@ -90,7 +90,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             ps.setString(1, username);
             try(var rs = ps.executeQuery()){
                 if(rs.next()){
-                    return new UserData(rs.getString(("username"), rs.getString("password")));
+                    return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                 }
             }
         } catch (SQLException e){
@@ -118,6 +118,20 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public AuthTokenData getAuthToken(String token) {
+        var sql = "SELECT token, username FROM auth_tokens WHERE token = ?";
+        try(var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)){
+            ps.setString(1, token);
+            try(var rs = ps.executeQuery()){
+                if(rs.next()){
+                    return new AuthTokenData(rs.getString("token"), rs.getString("username"));
+                }
+            }
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to retrieve auth token",e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
