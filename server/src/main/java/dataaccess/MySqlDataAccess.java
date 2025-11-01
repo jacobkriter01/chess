@@ -1,0 +1,92 @@
+package dataaccess;
+
+import com.google.gson.Gson;
+import datamodel.AuthTokenData;
+import datamodel.UserData;
+import exceptions.*;
+
+import java.sql.SQLException;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
+public class MySqlDataAccess implements DataAccess {
+
+    private final Gson gson = new Gson();
+
+    public MySqlDataAccess() throws ServiceException {
+        try {
+            DatabaseManager.createDatabase();
+            createTabbles();
+        } catch(DataAccessException ex){
+
+        }
+    }
+
+    private void createTabbles() throws DataAccessException {
+        String[] statements = {
+                """
+CREATE TABLES IF NOT EXISTS users(
+username VARCHAR(50) PRIMARY KEY,
+password VARCHAR(250) NOT NULL)
+""",
+                """
+CREATE TABLE IF NOT EXISTS auth_tokens (
+token VARCHAR(255)  PRIMARY KEY,
+username VARCHAR(50) NOT NULL,
+FORGEIN KEY (username) REFERENCES users(username))
+""",
+                """
+CREATE TABLE IF NOT EXISTS games (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+whiteUsername VARCHAR(50),
+blackUsername VARCHAR(50),
+gameState TEXT,
+FOREIGN KEY (whiteUsername) REFERENCES users(username),
+FOREIGN KEY (blackUsername) REFERENCES users(username))
+"""};
+
+
+        try (var conn = DatabaseManager.getConnection()){
+            for(var statement : statements){
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e){
+            throw new DataAccessException("Unable to create tabbles.", e);
+        }
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public void addUser(UserData user) {
+
+    }
+
+    @Override
+    public UserData getUser(String username) {
+        return null;
+    }
+
+    @Override
+    public void addAuthToken(AuthTokenData authToken) {
+
+    }
+
+    @Override
+    public AuthTokenData getAuthToken(String token) {
+        return null;
+    }
+
+    @Override
+    public void removeAuthToken(String token) {
+
+    }
+}
