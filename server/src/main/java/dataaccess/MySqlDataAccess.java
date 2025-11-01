@@ -5,6 +5,7 @@ import datamodel.AuthTokenData;
 import datamodel.UserData;
 import exceptions.*;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -67,6 +68,17 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public void addUser(UserData user) {
+        var sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)){
+            ps.setString(1, user.username());
+            ps.setString(2, user.password());
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to insert user.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
