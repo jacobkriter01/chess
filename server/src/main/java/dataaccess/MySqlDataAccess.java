@@ -8,6 +8,8 @@ import exceptions.*;
 
 import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -198,6 +200,40 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    public void joinGame(int gameId, String username, String color) {
+        String column = color.equalsIgnoreCase("WHITE") ? "whiteUsername" : "blackUsername";
+        var sql = "UPDATE games SET " + column + " =? WHERE id=?";
+        try(var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(sql)){
+            ps.setString(1, username);
+            ps.setInt(2, gameId);
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to join game.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Collection<GameData> listGames() {
+        var sql = "SELECT * FROM games";
+        var games = new ArrayList<GameData>();
+        try(var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql);
+             var rs = ps.executeQuery()){
+            while(rs.next()){
+                var whiteUsername = rs.getString("whiteUsername");
+                var blackUsername = rs.getString("blackUsername");
+                games.add(new GameData(rs.getInt("id"), rs.getString("name"), whiteUsername, blackUsername));
+            }
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to retrieve games.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return games;
     }
 
 }
