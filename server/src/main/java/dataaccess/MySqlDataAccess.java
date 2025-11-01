@@ -180,5 +180,25 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         return null;
     }
 
+    public GameData getGame(int gameId) {
+        var sql = "SELECT * FROM games WHERE id = ?";
+        try(var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)){
+            ps.setInt(1,gameId);
+            try (var rs = ps.executeQuery()){
+                if(rs.next()){
+                    var whiteUsername = rs.getString("whiteUsername");
+                    var blackUsername = rs.getString("blackUsername");
+                    return new GameData(rs.getInt("id"), rs.getString("name"), whiteUsername, blackUsername);
+                };
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to retrieve game.", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
 }
 
