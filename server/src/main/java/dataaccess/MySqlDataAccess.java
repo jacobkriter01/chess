@@ -137,6 +137,15 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public void removeAuthToken(String token) {
-
+        var sql = "DELETE FROM auth_tokens WHERE token = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)){
+            ps.setString(1, token);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Unable to remove auth token",e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
