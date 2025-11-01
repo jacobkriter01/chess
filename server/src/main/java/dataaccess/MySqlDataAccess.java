@@ -84,6 +84,20 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public UserData getUser(String username) {
+        var sql = "SELECT username, password FROM users WHERE username = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)){
+            ps.setString(1, username);
+            try(var rs = ps.executeQuery()){
+                if(rs.next()){
+                    return new UserData(rs.getString(("username"), rs.getString("password")));
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Unable to retrieve user", e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
