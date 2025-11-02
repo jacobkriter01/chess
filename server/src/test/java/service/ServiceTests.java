@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import datamodel.GameData;
 import datamodel.UserData;
 import exceptions.*;
@@ -14,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceTests {
 
-    private MemoryDataAccess dataAccess;
+    private MySqlDataAccess dataAccess;
     private UserService userService;
     private GameService gameService;
 
     private UserData newUser;
 
     @BeforeEach
-    void setUp() {
-        dataAccess = new MemoryDataAccess();
+    void setUp() throws ServiceException {
+        dataAccess = new MySqlDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         newUser = new UserData("jacob", "jacob@mail.com", "pwd");

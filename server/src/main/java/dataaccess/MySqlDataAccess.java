@@ -5,6 +5,7 @@ import datamodel.AuthTokenData;
 import datamodel.GameData;
 import datamodel.UserData;
 import exceptions.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 import java.sql.SQLException;
@@ -21,16 +22,16 @@ public class MySqlDataAccess implements DataAccess {
     public MySqlDataAccess() throws ServiceException {
         try {
             DatabaseManager.createDatabase();
-            createTabbles();
+            createTables();
         } catch(DataAccessException ex){
 
         }
     }
 
-    private void createTabbles() throws DataAccessException {
+    private void createTables() throws DataAccessException {
         String[] statements = {
                 """
-CREATE TABLES IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS users(
 username VARCHAR(50) PRIMARY KEY,
 password VARCHAR(250) NOT NULL)
 """,
@@ -38,12 +39,12 @@ password VARCHAR(250) NOT NULL)
 CREATE TABLE IF NOT EXISTS auth_tokens (
 token VARCHAR(255)  PRIMARY KEY,
 username VARCHAR(50) NOT NULL,
-FORGEIN KEY (username) REFERENCES users(username))
+FOREIGN KEY (username) REFERENCES users(username))
 """,
                 """
 CREATE TABLE IF NOT EXISTS games (
 id INT AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(100) NOT NULL,
+gameName VARCHAR(100) NOT NULL,
 whiteUsername VARCHAR(50),
 blackUsername VARCHAR(50),
 gameState TEXT,
@@ -68,9 +69,13 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
     public void clear() {
         try(var conn = DatabaseManager.getConnection();
             var stmt = conn.createStatement()){
-            stmt.executeUpdate("TRUNCATE TABLE auth_tokens");
-            stmt.executeUpdate("TRUNCATE TABLE users");
-            stmt.executeUpdate("TRUNCATE TABLE games");
+            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=0;");
+
+            stmt.executeUpdate("DELETE FROM auth_tokens");
+            stmt.executeUpdate("DELETE FROM games");
+            stmt.executeUpdate("DELETE FROM users");
+
+            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS=1;");
         } catch (SQLException e){
             throw new RuntimeException("Unable to clear tables.", e);
         } catch (DataAccessException e) {
@@ -83,8 +88,10 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         var sql = "INSERT INTO users (username, password) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)){
+            String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+
             ps.setString(1, user.username());
-            ps.setString(2, user.password());
+            ps.setString(2, hashedPassword);
             ps.executeUpdate();
         }catch (SQLException e){
             throw new RuntimeException("Unable to insert user.", e);
@@ -102,7 +109,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             ps.setString(1, username);
             try(var rs = ps.executeQuery()){
                 if(rs.next()){
-                    return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    return new UserData(rs.getString("username"),null, rs.getString("password"));
                 }
             }
         } catch (SQLException e){
@@ -115,11 +122,11 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
     @Override
     public void addAuthToken(AuthTokenData authToken) {
-        var sql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
+        var sql = "INSERT INTO auth_tokens (token, username) VALUES (?, ?)";
         try(var conn = DatabaseManager.getConnection();
             var ps = conn.prepareStatement(sql)){
             ps.setString(1, authToken.authToken());
-            ps.setString(2, authToken.authToken());
+            ps.setString(2, authToken.username());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Can't add auth token",e);
@@ -191,7 +198,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
                 if(rs.next()){
                     var whiteUsername = rs.getString("whiteUsername");
                     var blackUsername = rs.getString("blackUsername");
-                    return new GameData(rs.getInt("id"), rs.getString("name"), whiteUsername, blackUsername);
+                    return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername);
                 };
             }
         } catch (SQLException e) {
@@ -217,7 +224,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         }
     }
 
-    public Collection<GameData> listGames() {
+    public Collection<GameData> getAllGames() {
         var sql = "SELECT * FROM games";
         var games = new ArrayList<GameData>();
         try(var conn = DatabaseManager.getConnection();
@@ -226,7 +233,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             while(rs.next()){
                 var whiteUsername = rs.getString("whiteUsername");
                 var blackUsername = rs.getString("blackUsername");
-                games.add(new GameData(rs.getInt("id"), rs.getString("name"), whiteUsername, blackUsername));
+                games.add(new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername));
             }
         }catch (SQLException e){
             throw new RuntimeException("Unable to retrieve games.", e);

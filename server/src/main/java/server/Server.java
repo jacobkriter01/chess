@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -14,10 +15,10 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
-    private final MemoryDataAccess dataAccess;
+    private final MySqlDataAccess dataAccess;
 
-    public Server() {
-        dataAccess = new MemoryDataAccess();
+    public Server() throws ServiceException {
+        dataAccess = new MySqlDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
 

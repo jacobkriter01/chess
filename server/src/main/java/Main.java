@@ -1,9 +1,10 @@
 import chess.*;
 
+import exceptions.ServiceException;
 import server.Server;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ServiceException {
         Server server = new Server();
         server.run(8080);
 

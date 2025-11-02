@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
 import exceptions.AlreadyTakenException;
@@ -9,9 +10,9 @@ import exceptions.ServiceException;
 import exceptions.UnauthorizedException;
 
 public class GameService {
-    private final MemoryDataAccess dataAccess;
+    private final MySqlDataAccess dataAccess;
 
-    public GameService(MemoryDataAccess dataAccess) {
+    public GameService(MySqlDataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
