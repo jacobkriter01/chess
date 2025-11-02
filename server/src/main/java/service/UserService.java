@@ -39,7 +39,11 @@ public class UserService {
 
     public AuthTokenData login(UserData user) throws ServiceException {
         var existingUser = dataAccess.getUser(user.username());
-        if(existingUser == null || !existingUser.password().equals(user.password())){
+        if(existingUser == null){
+            throw new UnauthorizedException();
+        }
+
+        if(!org.mindrot.jbcrypt.BCrypt.checkpw(user.password(), existingUser.password())){
             throw new UnauthorizedException();
         }
 
