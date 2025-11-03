@@ -25,19 +25,24 @@ public class Server {
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("db", this::clearDatabase);
-        server.post("user", this::register);
-        server.post("session", this::login);
-        server.delete("session", this::logout);
-        server.post("game", this::createGame);
-        server.put("game", this::joinGame);
-        server.get("game", this::listGames);
+        server.delete("/db", this::clearDatabase);
+        server.post("/user", this::register);
+        server.post("/session", this::login);
+        server.delete("/session", this::logout);
+        server.post("/game", this::createGame);
+        server.put("/game", this::joinGame);
+        server.get("/game", this::listGames);
 
     }
 
     private void clearDatabase(Context ctx) {
-        dataAccess.clear();
-        ctx.status(200).result("{}");
+        try{
+            dataAccess.clear();
+            ctx.status(200).result("{}");
+        } catch (Throwable ex) {
+            var message = String.format("{ \"message\": \"Error: %s\"}", ex.getMessage());
+            ctx.status(500).result(message);
+        }
     }
 
     private void register(Context ctx) { //handler
@@ -52,30 +57,27 @@ public class Server {
             ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }catch (Exception ex) {
             var errorMessage = String.format("{ \"message\": \"Error: %s\"}", ex.getMessage());
-            ctx.status(403).result(errorMessage);
+            ctx.status(500).result(errorMessage);
         }
     }
 
     public void login(Context ctx){
         var serializer = new Gson();
-        try{
+        try {
             var user = serializer.fromJson(ctx.body(), UserData.class);
 
-            if(user.username() == null  || user.password() == null){
+            if (user.username() == null || user.password() == null) {
                 ctx.status(400).result("{ \"message\": \"Error: %s\"}");
                 return;
             }
 
             var loginResponse = userService.login(user);
             ctx.status(200).result(serializer.toJson(loginResponse));
+        }catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }catch (Exception ex){
-            String errorMessage = ex.getMessage();
-            if(errorMessage.equals("unauthorized")){
-                ctx.status(401).result("{ \"message\": \"Error: %s\"}");
-            } else {
-                ctx.status(400).result("{ \"message\": \"Error: %s\"}");
-            }
-
+            String errorMessage = String.format("{ \"message\": \"Error: %s\"}",ex.getMessage());
+            ctx.status(500).result(errorMessage);
         }
     }
 
@@ -89,8 +91,11 @@ public class Server {
 
             userService.logout(token);
             ctx.result("{}");
-        } catch (Exception ex) {
-            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        } catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }catch (Exception ex){
+            String errorMessage = String.format("{ \"message\": \"Error: %s\"}",ex.getMessage());
+            ctx.status(500).result(errorMessage);
         }
     }
 
@@ -106,8 +111,11 @@ public class Server {
             }
             var game = gameService.createGame(token, name);
             ctx.status(200).result("{ \"gameID\": " + game.getGameID() + "}");
+        }catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }catch (Exception ex){
-            ctx.status(401).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+            String errorMessage = String.format("{ \"message\": \"Error: %s\"}",ex.getMessage());
+            ctx.status(500).result(errorMessage);
         }
     }
 
