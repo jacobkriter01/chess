@@ -19,12 +19,12 @@ public class MySqlDataAccess implements DataAccess {
 
     private final Gson gson = new Gson();
 
-    public MySqlDataAccess() throws ServiceException {
+    public MySqlDataAccess(){
         try {
             DatabaseManager.createDatabase();
             createTables();
-        } catch(DataAccessException ex){
-
+        } catch(DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -61,7 +61,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             }
 
         } catch (SQLException e){
-            throw new DataAccessException("Unable to create tabbles.", e);
+            throw new DataAccessException("Unable to create tables.", e);
         }
     }
 

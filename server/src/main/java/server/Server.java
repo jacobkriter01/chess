@@ -17,7 +17,7 @@ public class Server {
     private final GameService gameService;
     private final MySqlDataAccess dataAccess;
 
-    public Server() throws ServiceException {
+    public Server() {
         dataAccess = new MySqlDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
