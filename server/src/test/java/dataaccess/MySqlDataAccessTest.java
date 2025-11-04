@@ -64,4 +64,15 @@ class MySqlDataAccessTest {
        assertEquals("user1", result.username());
    }
 
+   @Test
+   @DisplayName("getAuthToken duplicate token")
+   public void testGetAuthTokenNegative() {
+       var user = new UserData("user1", null, "pwd");
+       dao.addUser(user);
+       var token = new AuthTokenData("token123", "user1");
+       dao.addAuthToken(token);
+
+       var dup = new AuthTokenData("token123", "user1");
+       assertThrows(RuntimeException.class, () -> dao.addAuthToken(dup));
+   }
 }
