@@ -101,4 +101,12 @@ class MySqlDataAccessTest {
        assertDoesNotThrow(() -> dao.removeAuthToken("token123"));
     }
 
+    @Test
+    @DisplayName("addGame positive")
+    public void addGamePositive() {
+        var game = dao.addGame("Chess");
+        assertNotNull(game);
+        assertEquals("Chess",game.getGameName());
+    }
+
 }
