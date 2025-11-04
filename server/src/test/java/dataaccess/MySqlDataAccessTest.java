@@ -116,4 +116,17 @@ class MySqlDataAccessTest {
        assertNull(result);
     }
 
+    @Test
+    @DisplayName("joinGame positive")
+    public void joinGamePositive() {
+       dao.addUser(new UserData("user1", null, "pwd"));
+       var game = dao.addGame("Chess");
+
+       dao.joinGame(game.getGameID(), "user1", "WHITE");
+
+       var update = dao.getGame(game.getGameID());
+       assertEquals("user1", update.getWhiteUsername());
+
+    }
+
 }
