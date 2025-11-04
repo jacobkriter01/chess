@@ -79,6 +79,18 @@ class MySqlDataAccessTest {
    }
 
     @Test
+    @DisplayName("getAuthToken token positive")
+    public void testGetAuthTokenPositive() {
+        var user = new UserData("user1", null, "pwd");
+        dao.addUser(user);
+        var token = new AuthTokenData("token123", "user1");
+        dao.addAuthToken(token);
+
+        assertNotNull(dao.getAuthToken("token123"));
+        assertEquals("user1", dao.getAuthToken("token123").username());
+    }
+
+    @Test
     @DisplayName("getAuthToken token not exist")
     public void testGetAuthTokenNegative() {
         var result = dao.getAuthToken("token123");
