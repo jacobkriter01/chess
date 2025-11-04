@@ -65,8 +65,8 @@ class MySqlDataAccessTest {
    }
 
    @Test
-   @DisplayName("getAuthToken duplicate token")
-   public void testGetAuthTokenNegative() {
+   @DisplayName("addAuthToken duplicate token")
+   public void testAddAuthTokenNegative() {
        var user = new UserData("user1", null, "pwd");
        dao.addUser(user);
        var token = new AuthTokenData("token123", "user1");
@@ -75,4 +75,12 @@ class MySqlDataAccessTest {
        var dup = new AuthTokenData("token123", "user1");
        assertThrows(RuntimeException.class, () -> dao.addAuthToken(dup));
    }
+
+    @Test
+    @DisplayName("getAuthToken token not exist")
+    public void testGetAuthTokenNegative() {
+        var result = dao.getAuthToken("token123");
+        assertNull(result);
+    }
+
 }
