@@ -23,7 +23,7 @@ class MySqlDataAccessTest {
 
    @Test
    @DisplayName("addUser positive")
-    public void testAddGetUser() {
+    public void testAddUser() {
        var user = new UserData("Jacob", null, "pwd");
        dao.addUser(user);
 
@@ -51,6 +51,20 @@ class MySqlDataAccessTest {
        var user = new UserData(null, null, null);
        assertThrows(RuntimeException.class, () -> dao.addUser(user));
    }
+
+    @Test
+    @DisplayName("getUser success")
+    public void testGetUserPositive() {
+        var user = new UserData("Jacob", null, "pwd");
+        dao.addUser(user);
+
+        var result = dao.getUser("Jacob");
+        assertNotNull(result);
+        assertEquals("Jacob", result.username());
+
+        assertNotEquals("pwd", result.password());
+        assertTrue(BCrypt.checkpw("pwd", result.password()));
+    }
 
    @Test
    @DisplayName("getUser does not exist")
