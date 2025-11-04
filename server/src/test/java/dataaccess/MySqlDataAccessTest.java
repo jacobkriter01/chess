@@ -83,4 +83,16 @@ class MySqlDataAccessTest {
         assertNull(result);
     }
 
+    @Test
+    @DisplayName("remove authToken positive")
+    public void removeAuthTokenPositive() {
+       var user = new UserData("user1", null, "pwd");
+       dao.addUser(user);
+       var token = new AuthTokenData("token123", "user1");
+       dao.addAuthToken(token);
+
+       dao.removeAuthToken("token123");
+       assertNull(dao.getAuthToken("token123"));
+    }
+
 }
