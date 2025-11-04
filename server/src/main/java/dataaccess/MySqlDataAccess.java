@@ -216,7 +216,10 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             var ps = conn.prepareStatement(sql)){
             ps.setString(1, username);
             ps.setInt(2, gameId);
-            ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
+            if(rowsAffected == 0){
+                throw new RuntimeException("Invalid game ID" +  gameId);
+            }
         }catch (SQLException e){
             throw new RuntimeException("Unable to join game.", e);
         } catch (DataAccessException e) {
