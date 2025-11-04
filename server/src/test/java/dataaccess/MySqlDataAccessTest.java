@@ -46,6 +46,13 @@ class MySqlDataAccessTest {
    }
 
    @Test
+   @DisplayName("addUser fails")
+   public void addUserNegative() {
+       var user = new UserData(null, null, null);
+       assertThrows(RuntimeException.class, () -> dao.addUser(user));
+   }
+
+   @Test
    @DisplayName("getUser does not exist")
    public void testGetUserNegative() {
        var result = dao.getUser("fake");
