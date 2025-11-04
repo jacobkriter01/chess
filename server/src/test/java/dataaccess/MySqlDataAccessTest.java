@@ -146,5 +146,10 @@ class MySqlDataAccessTest {
        assertEquals(2, allGames.size());
     }
 
-
+    @Test
+    @DisplayName("getAllGames negative, no games")
+    public void getAllGamesNegative() {
+       Collection<GameData> allGames = dao.getAllGames();
+       assertEquals(0, allGames.size());
+    }
 }
