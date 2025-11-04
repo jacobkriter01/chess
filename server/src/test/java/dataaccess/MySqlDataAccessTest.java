@@ -28,7 +28,6 @@ class MySqlDataAccessTest {
        dao.addUser(user);
 
        var result = dao.getUser("Jacob");
-       assertNotNull(result);
        assertEquals("Jacob", result.username());
 
        assertNotEquals("pwd", result.password());
@@ -55,15 +54,12 @@ class MySqlDataAccessTest {
     @Test
     @DisplayName("getUser success")
     public void testGetUserPositive() {
-        var user = new UserData("Jacob", null, "pwd");
+        var user = new UserData("user1", null, "pwd");
         dao.addUser(user);
 
-        var result = dao.getUser("Jacob");
+        var result = dao.getUser("user1");
         assertNotNull(result);
-        assertEquals("Jacob", result.username());
-
-        assertNotEquals("pwd", result.password());
-        assertTrue(BCrypt.checkpw("pwd", result.password()));
+        assertEquals("user1", result.username());
     }
 
    @Test
