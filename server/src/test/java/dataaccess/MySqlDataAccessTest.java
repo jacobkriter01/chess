@@ -95,4 +95,10 @@ class MySqlDataAccessTest {
        assertNull(dao.getAuthToken("token123"));
     }
 
+    @Test
+    @DisplayName("remove authToken not exist")
+    public void removeAuthTokenNegative() {
+       assertDoesNotThrow(() -> dao.removeAuthToken("token123"));
+    }
+
 }
