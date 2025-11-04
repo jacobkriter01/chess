@@ -109,4 +109,11 @@ class MySqlDataAccessTest {
         assertEquals("Chess",game.getGameName());
     }
 
+    @Test
+    @DisplayName("getGame negative")
+    public void getGameNegative() {
+       var result = dao.getGame(123);
+       assertNull(result);
+    }
+
 }
