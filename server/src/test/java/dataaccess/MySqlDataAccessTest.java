@@ -152,4 +152,15 @@ class MySqlDataAccessTest {
        Collection<GameData> allGames = dao.getAllGames();
        assertEquals(0, allGames.size());
     }
+
+    @Test
+    @DisplayName("clear positive test")
+    public void testClearPositive() {
+       dao.addUser(new UserData("user1", null, "pwd"));
+       dao.addGame("Test1");
+       dao.clear();
+
+       assertNull(dao.getUser("user1"));
+       assertTrue(dao.getAllGames().isEmpty());
+    }
 }
