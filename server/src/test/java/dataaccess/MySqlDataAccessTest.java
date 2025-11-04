@@ -1,11 +1,13 @@
 package dataaccess;
 
 import datamodel.AuthTokenData;
+import datamodel.GameData;
 import datamodel.UserData;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -126,7 +128,23 @@ class MySqlDataAccessTest {
 
        var update = dao.getGame(game.getGameID());
        assertEquals("user1", update.getWhiteUsername());
-
     }
+
+    @Test
+    @DisplayName("joinGame not exist")
+    public void joinGameNegative() {
+       assertThrows(RuntimeException.class, () -> dao.joinGame(123, "user1", "WHITE"));
+    }
+
+    @Test
+    @DisplayName("getAllGames positive")
+    public void getAllGamesPositive() {
+       var g1 = dao.addGame("Test1");
+       var g2 = dao.addGame("Test2");
+
+       Collection<GameData> allGames = dao.getAllGames();
+       assertEquals(2, allGames.size());
+    }
+
 
 }
