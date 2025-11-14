@@ -1,6 +1,12 @@
 import com.google.gson.Gson;
 import exceptions.ServiceException;
 import datamodel.UserData;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import responses.CreateGameResponse;
+import responses.ListGamesResponse;
+import responses.LoginResponse;
+import responses.RegisterResponse;
 
 import java.net.URI;
 import java.net.http.*;
@@ -16,42 +22,43 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public Map register(UserData user) throws ServiceException {
+    public RegisterResponse register(UserData user) throws ServiceException {
         var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        return handleResponse(response, RegisterResponse.class);
     }
 
-    public Map login(UserData user) throws ServiceException {
+    public LoginResponse login(UserData user) throws ServiceException {
         var request = buildRequest("POST", "/session", user, null);
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        return handleResponse(response, LoginResponse.class);
     }
 
-    public int createGame(String authToken, String gameName) throws ServiceException {
-        var body = Map.of("gamaName", gameName);
-        var request = buildRequest("POST", "/game", body, authToken);
-        var response = sendRequest(request);
-
-        Map result = handleResponse(response, Map.class);
-        Double id = (Double) result.get("id");
-        return id.intValue();
-    }
-
-    public void joinGame(String authToken, int gameID, String playerColor) throws ServiceException {
-        var body = Map.of("gameID", gameID, "playerColor", playerColor);
-        var request = buildRequest("PUT", "/game", body, authToken);
+    public void logout(String authToken) throws ServiceException {
+        var request = buildRequest("DELETE", "/session", authToken, null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
-    public Map listGames(String authToken) throws ServiceException {
-        var request = buildRequest("GET", "/game", null, authToken);
+    public CreateGameResponse createGame(String authToken, CreateGameRequest gameRequest) throws ServiceException {
+        var request = buildRequest("POST", "/game", gameRequest, authToken);
         var response = sendRequest(request);
-        return handleResponse(response, Map.class);
+        return handleResponse(response, CreateGameResponse.class);
     }
 
-    public void clearDB() throws ServiceException {
+    public void joinGame(String authToken, JoinGameRequest gameRequest) throws ServiceException {
+        var request = buildRequest("PUT", "/game", gameRequest, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
+    public ListGamesResponse listGames(String authToken) throws ServiceException {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResponse.class);
+    }
+
+    public void clearDb() throws ServiceException {
         var request = buildRequest("DELETE", "/game", null, null);
         var response = sendRequest(request);
         handleResponse(response, null);
