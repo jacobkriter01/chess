@@ -55,6 +55,12 @@ public class ServerFacade {
         return handleResponse(response, Map.class);
     }
 
+    public void clearDB() throws ServiceException {
+        var request = buildRequest("DELETE", "/game", null, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
