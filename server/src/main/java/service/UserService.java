@@ -1,7 +1,7 @@
 package service;
 import dataaccess.DataAccess;
 import datamodel.UserData;
-import datamodel.RegisterResponse;
+import responses.RegisterResponse;
 import datamodel.AuthTokenData;
 import exceptions.ServiceException;
 import exceptions.AlreadyTakenException;

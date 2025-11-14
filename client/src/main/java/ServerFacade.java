@@ -1,15 +1,11 @@
-package client;
-
 import com.google.gson.Gson;
 import exceptions.ServiceException;
 import datamodel.UserData;
-import datamodel.GameData;
 
 import java.net.URI;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.security.Provider;
 import java.util.Map;
 
 public class ServerFacade {
