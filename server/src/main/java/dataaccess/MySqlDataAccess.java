@@ -171,7 +171,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         ChessGame initialGame = new ChessGame();
         String gameJson = gson.toJson(initialGame);
 
-        var sql = "INSERT INTO games (gameName) VALUES (?)";
+        var sql = "INSERT INTO games (gameName, gameState, whiteUsername, blackUsername) VALUES (?, ?, NULL, NULL)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql, RETURN_GENERATED_KEYS)){
             ps.setString(1, gameName);

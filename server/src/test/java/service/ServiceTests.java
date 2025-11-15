@@ -21,8 +21,9 @@ public class ServiceTests {
     private UserData newUser;
 
     @BeforeEach
-    void setUp() throws ServiceException {
+    void setUp() {
         dataAccess = new MySqlDataAccess();
+        dataAccess.clear();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         newUser = new UserData("jacob", "jacob@mail.com", "pwd");
@@ -117,7 +118,8 @@ public class ServiceTests {
         var game =  gameService.createGame(token, "test game");
         gameService.joinGame(token, game.getGameID(), "WHITE");
 
-        assertEquals("jacob", game.getWhiteUsername());
+        var updated = dataAccess.getGame(game.getGameID());
+        assertEquals("jacob", updated.getWhiteUsername());
     }
 
     @Test
