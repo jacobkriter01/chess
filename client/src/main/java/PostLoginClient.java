@@ -79,6 +79,7 @@ public class PostLoginClient {
         try{
             var request = new CreateGameRequest(gameName);
             server.createGame(authToken, request);
+            System.out.println("Created game");
         } catch (ServiceException e){
             System.out.println(e.getMessage());
         }
