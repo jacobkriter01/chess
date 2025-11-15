@@ -1,12 +1,8 @@
 import com.google.gson.Gson;
 import exceptions.ServiceException;
 import datamodel.UserData;
-import requests.CreateGameRequest;
-import requests.JoinGameRequest;
-import responses.CreateGameResponse;
-import responses.ListGamesResponse;
-import responses.LoginResponse;
-import responses.RegisterResponse;
+import requests.*;
+import responses.*;
 
 import java.net.URI;
 import java.net.http.*;
@@ -22,13 +18,13 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public RegisterResponse register(UserData user) throws ServiceException {
+    public RegisterResponse register(RegisterRequest user) throws ServiceException {
         var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResponse.class);
     }
 
-    public LoginResponse login(UserData user) throws ServiceException {
+    public LoginResponse login(LoginRequest user) throws ServiceException {
         var request = buildRequest("POST", "/session", user, null);
         var response = sendRequest(request);
         return handleResponse(response, LoginResponse.class);
@@ -111,7 +107,7 @@ public class ServerFacade {
 
     private String extractMessage(String jsonError) {
         try{
-            Map m = new Gson().fromJson(jsonError, Map.class);
+            var m = new Gson().fromJson(jsonError, Map.class);
             return(String) m.get("message");
         } catch (Exception ex){
             return "unknown error";
