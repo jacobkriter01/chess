@@ -32,7 +32,7 @@ public class ServerFacade {
     }
 
     public void logout(String authToken) throws ServiceException {
-        var request = buildRequest("DELETE", "/session", authToken, null);
+        var request = buildRequest("DELETE", "/session", null, authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
