@@ -114,7 +114,7 @@ public class PostLoginClient {
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
         }catch (ServiceException ex){
-            System.out.println("Whoops" + ex.getMessage());
+            System.out.println("Whoops " + ex.getMessage());
         }
     }
 
@@ -131,7 +131,6 @@ public class PostLoginClient {
                 System.out.println("Game ID does not exist");
                 return;
             }
-            System.out.println("Obtained game " + gameID);
 
             var gameState = server.getGameState(authToken, gameID);
 

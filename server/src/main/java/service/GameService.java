@@ -76,8 +76,4 @@ public class GameService {
         }
         return game;
     }
-
-    public void saveGameState(int gameID, chess.ChessGame game) throws ServiceException {
-        dataAccess.updateGameState(gameID, game);
-    }
 }
