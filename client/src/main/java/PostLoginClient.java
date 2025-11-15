@@ -52,8 +52,7 @@ public class PostLoginClient {
             ListGamesResponse response = server.listGames(authToken);
             System.out.println("Games:");
             for (var g : response.games()){
-                System.out.println("- " + g.gameId() + ": " + g.gameName()
-                + " (" + g.whiteUsername() + ", " + g.blackUsername() + ")");
+                System.out.println("- " + g);
             }
         }catch (ServiceException e){
             System.out.println(e.getMessage());
@@ -71,7 +70,7 @@ public class PostLoginClient {
         try{
             var request = new CreateGameRequest(gameName);
             CreateGameResponse response = server.createGame(authToken, request);
-            System.out.println("Created game: " + response.gameId());
+            System.out.println("Created game: " + response.gameID());
         } catch (ServiceException e){
             System.out.println(e.getMessage());
         }
@@ -84,20 +83,20 @@ public class PostLoginClient {
         }
 
         try{
-            int gameId = Integer.parseInt(parts[1]);
-            String color = parts[2];
+            int gameID = Integer.parseInt(parts[1]);
+            String color = parts[2].toLowerCase();
 
-            JoinGameRequest request = new JoinGameRequest(authToken, gameId, color);
+            JoinGameRequest request = new JoinGameRequest(authToken, gameID, color);
             JoinGameResponse response = server.joinGame(authToken, request);
 
-            System.out.println("Joined game " + gameId +" as "+ color);
+            System.out.println("Joined game " + gameID +" as "+ color);
 
             GamePlayClient gamePlayClient = new GamePlayClient(color);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
         }catch (ServiceException ex){
-            System.out.println(ex.getMessage());
+            System.out.println("Whoops" + ex.getMessage());
         }
     }
 

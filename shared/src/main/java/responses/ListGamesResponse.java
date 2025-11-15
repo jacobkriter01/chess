@@ -1,8 +1,9 @@
 package responses;
 
 import java.util.List;
+import java.util.Map;
 
-public record ListGamesResponse(List<GameHeader> games) {
-
-    public record GameHeader(int gameId, String gameName, String whiteUsername, String blackUsername) {}
+public record ListGamesResponse(List<GameHeader> games, String message) {
+    public record GameHeader(int gameID, String gameName, String white, String black) {
+    }
 }
