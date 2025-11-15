@@ -65,4 +65,17 @@ public class ServerFacadeTests {
         facade.register(new RegisterRequest("jacob", "pwd", "email"));
         assertThrows(ServiceException.class, () -> facade.login(new LoginRequest("jacob", "wrong")));
     }
+
+    @Test
+    public void logoutPositive() throws Exception {
+        facade.register(new RegisterRequest("jacob", "pwd", "email"));
+        String token = facade.login(new LoginRequest("jacob", "pwd")).authToken();
+
+        assertDoesNotThrow(() -> facade.logout(token));
+    }
+
+    @Test
+    public void logoutNegative() throws Exception {
+        assertThrows(ServiceException.class, () -> facade.logout("wrong"));
+    }
 }
