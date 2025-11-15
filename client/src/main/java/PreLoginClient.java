@@ -67,7 +67,7 @@ public class PreLoginClient {
 
         try {
             var request = new RegisterRequest(username, password, email);
-            RegisterResponse response = server.registerDebug(request);
+            RegisterResponse response = server.register(request);
 
             System.out.println("Logged in as " + response.username());
             return response.authToken();
