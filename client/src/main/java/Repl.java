@@ -8,11 +8,17 @@ public class Repl {
     }
 
     public void run(){
-        PreLoginClient preLoginClient = new PreLoginClient(serverUrl);
-        String authToken = preLoginClient.run();
+        while(true){
+            PreLoginClient preLoginClient = new PreLoginClient(serverUrl);
+            String authToken = preLoginClient.run();
+            if(authToken == null){
+                break;
+            }
 
-        PostLoginClient postLoginClient = new PostLoginClient(serverUrl);
-        postLoginClient.run(authToken);
+            PostLoginClient postLoginClient = new PostLoginClient(serverUrl);
+            postLoginClient.run(authToken);
+
+        }
 
     }
 }

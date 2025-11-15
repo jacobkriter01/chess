@@ -41,7 +41,7 @@ public class GamePlayClient {
                 int col = orientation == ChessGame.TeamColor.WHITE ? c : 7-c;
                 ChessPiece piece = board.getPiece(new ChessPosition(row+1, col+1));
 
-                boolean lightSquare = (row + col) % 2 == 0;
+                boolean lightSquare = (row + col) % 2 == 1;
                 String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
 
                 String symbol;
