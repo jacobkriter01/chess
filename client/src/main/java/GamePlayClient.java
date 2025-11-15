@@ -1,4 +1,5 @@
 import chess.*;
+import static ui.EscapeSequences.*;
 
 public class GamePlayClient {
     private final ChessBoard board;
@@ -17,35 +18,50 @@ public class GamePlayClient {
         }else{
             orientation = ChessGame.TeamColor.BLACK;
         }
-        System.out.println(board.toString(orientation));
+        drawBoard(board, orientation);
 
     }
 
-    private void drawBoardFlipped(){
-        for (int row = 8; row >= 1; row --){
-            for (int col = 8; col >= 1; col --){
-                char pieceSymbol = getPieceSymbol(row, col);
-                System.out.print("|" + pieceSymbol);
+    private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){
+        String header;
+        if(ChessGame.TeamColor.WHITE == orientation){
+            header = "   a  b  c  d  e  f  g  h";
+        } else {
+            header = "   h  g  f  e  d  c  b  a";
+        }
+        System.out.println(header);
+
+        for (int r = 0; r < 8; r++){
+            int row = orientation == ChessGame.TeamColor.WHITE ? 7-r : r;
+            System.out.print((row + 1) + " ");
+
+            for (int c = 0; c < 8; c++){
+                int col = orientation == ChessGame.TeamColor.WHITE ? c : 7-c;
+                ChessPiece piece = board.getPiece(new ChessPosition(row+1, col+1));
+
+                boolean lightSquare = (row + col) % 2 == 0;
+                String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+
+                String symbol;
+                if (piece == null) {
+                    symbol = EMPTY;
+                }else{
+                    switch(piece.getPieceType()){
+                        case KING -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KING : WHITE_KING;
+                        case QUEEN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_QUEEN : WHITE_QUEEN;
+                        case BISHOP -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_BISHOP : WHITE_BISHOP;
+                        case ROOK -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_ROOK : WHITE_ROOK;
+                        case KNIGHT -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KNIGHT : WHITE_KNIGHT;
+                        case PAWN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_PAWN : WHITE_PAWN;
+                        default -> symbol = "?";
+                    }
+                }
+                System.out.print(bg + symbol + RESET_BG_COLOR);
             }
-            System.out.println("|");
+            System.out.print(" " + (row + 1));
+            System.out.println();
         }
+        System.out.println(header);
     }
 
-    private char getPieceSymbol(int row, int col){
-        var piece = board.getPiece(new ChessPosition(row, col));
-        if (piece == null){
-            return ' ';
-        }
-        char symbol;
-        switch(piece.getPieceType()){
-            case KING -> symbol = 'K';
-            case QUEEN -> symbol = 'Q';
-            case ROOK -> symbol = 'R';
-            case PAWN -> symbol = 'P';
-            case KNIGHT -> symbol = 'N';
-            case BISHOP -> symbol = 'B';
-            default -> symbol = ' ';
-        }
-        return piece.getTeamColor() == ChessGame.TeamColor.BLACK ? Character.toLowerCase(symbol) : symbol;
-    }
 }
