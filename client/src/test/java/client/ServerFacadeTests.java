@@ -78,4 +78,19 @@ public class ServerFacadeTests {
     public void logoutNegative() throws Exception {
         assertThrows(ServiceException.class, () -> facade.logout("wrong"));
     }
+
+    @Test
+    public void createGamePositive() throws Exception {
+        facade.register(new RegisterRequest("jacob", "pwd", "email"));
+        String token = facade.login(new LoginRequest("jacob", "pwd")).authToken();
+
+        var response = facade.createGame(token, new CreateGameRequest("coolGame"));
+
+        assertTrue(response.gameID() > 0);
+    }
+
+    @Test
+    public void createGameNegative() throws Exception {
+        assertThrows(ServiceException.class, () -> facade.createGame("wrong", new CreateGameRequest("coolGame")));
+    }
 }
