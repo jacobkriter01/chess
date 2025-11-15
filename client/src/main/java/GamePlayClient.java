@@ -11,11 +11,13 @@ public class GamePlayClient {
     }
 
     public void run(){
-        if(playerColor.equals("BLACK")){
-            drawBoardFlipped();
+        ChessGame.TeamColor orientation;
+        if (this.playerColor.equals("WHITE")) {
+            orientation = ChessGame.TeamColor.WHITE;
         }else{
-            System.out.println(board);
+            orientation = ChessGame.TeamColor.BLACK;
         }
+        System.out.println(board.toString(orientation));
 
     }
 

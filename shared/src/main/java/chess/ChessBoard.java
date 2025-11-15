@@ -133,10 +133,47 @@ public class ChessBoard {
 
     @Override
     public String toString() {
+        return toString(ChessGame.TeamColor.WHITE);
+    }
+
+    public String toString(ChessGame.TeamColor orientation) {
         StringBuilder boardBuilder = new StringBuilder();
 
-        for(int row = 8; row >= 1; row--) {
-            for (int col = 8; col >= 1; col--) {
+        int startRow, endRow, stepRow, startCol, endCol, stepCol;
+
+        if (orientation == ChessGame.TeamColor.WHITE) {
+            startRow = 8;
+            endRow = 0;
+            stepRow = -1;
+            startCol = 1;
+            endCol = 9;
+            stepCol = 1;
+        }else{
+            startCol = 8;
+            endCol = 0;
+            stepCol = -1;
+            startRow = 1;
+            endRow = 9;
+            stepRow = 1;
+        }
+
+        StringBuilder header = new StringBuilder();
+        header.append(" ");
+        if(orientation == ChessGame.TeamColor.WHITE){
+            for (char c='a'; c <= 'h'; c++){
+                header.append(" ").append(c);
+            }
+        }else{
+            for (char c='h'; c >='a'; c--){
+                header.append(" ").append(c);
+            }
+        }
+        header.append("\n");
+        boardBuilder.append(header.toString());
+
+        for(int row = startRow; row != endRow; row+=stepRow) {
+            boardBuilder.append(row);
+            for (int col = startCol; col != endCol; col+=stepCol) {
                 ChessPiece piece = getPiece(new ChessPosition(row, col));
                 boardBuilder.append("|");
 
@@ -159,8 +196,12 @@ public class ChessBoard {
                     boardBuilder.append(symbol);
                 }
             }
+            boardBuilder.append("|");
+            boardBuilder.append(row);
             boardBuilder.append("\n");
         }
+
+        boardBuilder.append(header.toString());
 
         return boardBuilder.toString();
     }
