@@ -197,29 +197,29 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
              var ps = conn.prepareStatement(sql)){
             ps.setInt(1,gameId);
             try (var rs = ps.executeQuery()){
-                if(rs.next()){
-                    var whiteUsername = rs.getString("whiteUsername");
-                    var blackUsername = rs.getString("blackUsername");
-                    var gameStateJson = rs.getString("gameState");
-                    ChessGame game = null;
-                    if (gameStateJson != null && !gameStateJson.isBlank()) {
-                        try{
-                            game = gson.fromJson(gameStateJson, ChessGame.class);
-                        } catch (Exception ex) {
-                            game = new ChessGame();
-                        }
-                    } else{
+                if(!rs.next()) {
+                    return null;
+                }
+                var whiteUsername = rs.getString("whiteUsername");
+                var blackUsername = rs.getString("blackUsername");
+                var gameStateJson = rs.getString("gameState");
+                ChessGame game = null;
+                if (gameStateJson != null && !gameStateJson.isBlank()) {
+                    try{
+                        game = gson.fromJson(gameStateJson, ChessGame.class);
+                    } catch (Exception ex) {
                         game = new ChessGame();
                     }
-                    return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game);
-                };
+                } else{
+                    game = new ChessGame();
+                }
+                return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Unable to retrieve game.", e);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     public void joinGame(int gameId, String username, String color) {
