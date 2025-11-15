@@ -1,3 +1,4 @@
+import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import responses.*;
 import responses.*;
@@ -25,8 +26,8 @@ public class PostLoginClient {
             switch (command){
                 case "help" -> printHelp();
                 case "list" -> listGames(authToken);
-                case "create" -> createGame(authToken);
-                case "join" -> joinGame(authToken);
+                case "create" -> createGame(authToken, parts);
+                case "join" -> joinGame(authToken, parts);
                 case "logout" -> {
                     logout(authToken);
                     return;
@@ -58,7 +59,7 @@ public class PostLoginClient {
         }
     }
 
-    private void createGame(String authToken, String[] parts) throws ServiceException{
+    private void createGame(String authToken, String[] parts){
         if (parts.length != 2){
             System.out.println("Usage: create <game name>");
             return;
@@ -67,7 +68,8 @@ public class PostLoginClient {
         String gameName = parts[1];
 
         try{
-            CreateGameResponse response = server.createGame(authToken, gameName);
+            var request = new CreateGameRequest(gameName);
+            CreateGameResponse response = server.createGame(authToken, request);
             System.out.println("Created game: " + response.gameId());
         } catch (ServiceException e){
             System.out.println(e.getMessage());

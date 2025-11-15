@@ -36,9 +36,8 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public CreateGameResponse createGame(String authToken, String gameName) throws ServiceException {
-        var body = new CreateGameRequest(gameName);
-        var request = buildRequest("POST", "/game", body, authToken);
+    public CreateGameResponse createGame(String authToken, CreateGameRequest gameRequest) throws ServiceException {
+        var request = buildRequest("POST", "/game", gameRequest, authToken);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResponse.class);
     }
@@ -46,7 +45,7 @@ public class ServerFacade {
     public JoinGameResponse joinGame(String authToken, JoinGameRequest gameRequest) throws ServiceException {
         var request = buildRequest("PUT", "/game", gameRequest, authToken);
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, null);
     }
 
     public ListGamesResponse listGames(String authToken) throws ServiceException {
