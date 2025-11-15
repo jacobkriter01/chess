@@ -7,10 +7,7 @@ public class Main {
             serverUrl = args[0];
         }
 
-        try{
-            new Repl(serverUrl).run();
-        } catch (Throwable ex){
-            System.out.println("Unable to start client: %s%n" + ex.getMessage());
-        }
+        Repl repl = new Repl(serverUrl);
+        repl.run();
     }
 }

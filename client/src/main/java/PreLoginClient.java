@@ -10,7 +10,7 @@ import static ui.EscapeSequences.*;
 public class PreLoginClient {
     private final ServerFacade server;
     private final Scanner scanner = new Scanner(System.in);
-    private final State state = State.POSTLOGIN;
+    private final State state = State.PRELOGIN;
 
     public PreLoginClient(String url){
         this.server = new ServerFacade(url);

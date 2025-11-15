@@ -1,15 +1,18 @@
-public class Repl {
-    private final PreLoginClient preLogin;
-    private final PostLoginClient postLogin;
-    private final GamePlayClient gamePlay;
+import java.util.Scanner;
 
-    private State state = State.PRELOGIN;
+public class Repl {
+    private final String serverUrl;
 
     public Repl(String serverUrl){
-        ServerFacade server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
+    }
 
-        preLogin = new PreLoginClient(server, this);
-        postLogin = new PostLoginClient(server, this);
-        gamePlay = new GamePlayClient(server, this);
+    public void run(){
+        PreLoginClient preLoginClient = new PreLoginClient(serverUrl);
+        String authToken = preLoginClient.run();
+
+        PostLoginClient postLoginClient = new PostLoginClient(serverUrl);
+        postLoginClient.run(authToken);
+
     }
 }
