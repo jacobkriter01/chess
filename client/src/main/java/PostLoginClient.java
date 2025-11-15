@@ -90,6 +90,9 @@ public class PostLoginClient {
             JoinGameResponse response = server.joinGame(authToken, request);
 
             System.out.println("Joined game " + gameId +" as "+ color);
+
+            GamePlayClient gamePlayClient = new GamePlayClient(color);
+            gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
         }catch (ServiceException ex){
