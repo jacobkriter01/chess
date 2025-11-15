@@ -49,6 +49,12 @@ public class ServerFacade {
         return handleResponse(response, null);
     }
 
+    public GameStateResponse getGameState(String authToken, int gameID) throws ServiceException{
+        var request = buildRequest("GET", "/game/"+gameID, null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, GameStateResponse.class);
+    }
+
     public ListGamesResponse listGames(String authToken) throws ServiceException {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);

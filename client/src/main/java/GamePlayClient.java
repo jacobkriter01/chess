@@ -5,29 +5,31 @@ public class GamePlayClient {
     private final ChessBoard board;
     private final String playerColor;
 
-    public GamePlayClient(String playerColor) {
+    public GamePlayClient(String playerColor, ChessBoard serverBoard) {
         this.playerColor = playerColor.toUpperCase();
-        this.board = new ChessBoard();
-        this.board.resetBoard();
+        this.board = serverBoard;
     }
 
     public void run(){
         ChessGame.TeamColor orientation;
-        if (this.playerColor.equals("WHITE")) {
+        if(playerColor.equals("WHITE")){
             orientation = ChessGame.TeamColor.WHITE;
-        }else{
+        }else if(playerColor.equals("BLACK")){
             orientation = ChessGame.TeamColor.BLACK;
+        }else{
+            orientation = ChessGame.TeamColor.WHITE;
         }
         drawBoard(board, orientation);
-
     }
 
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){
         String header;
         if(ChessGame.TeamColor.WHITE == orientation){
             header = "   a  b  c  d  e  f  g  h";
-        } else {
+        } else if (ChessGame.TeamColor.BLACK == orientation) {
             header = "   h  g  f  e  d  c  b  a";
+        }else{
+            header = "   a  b  c  d  e  f  g  h"; //Observer
         }
         System.out.println(header);
 

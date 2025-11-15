@@ -1,16 +1,20 @@
 package datamodel;
 
+import chess.*;
+
 public class GameData {
     private int gameID;
     private String gameName;
     private String whiteUsername;
     private String blackUsername;
+    private ChessGame game;
 
-    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername) {
+    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername, ChessGame game) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
+        this.game = (game != null) ? game : new ChessGame();
     }
 
     public int getGameID(){
@@ -30,5 +34,11 @@ public class GameData {
     }
     public void setBlackUsername(String blackUsername){
         this.blackUsername = blackUsername;
+    }
+    public ChessGame getGame(){
+        return game;
+    }
+    public void setGame(ChessGame game){
+        this.game = (game != null) ? game : new ChessGame();
     }
 }

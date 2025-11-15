@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
@@ -170,15 +171,19 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
 
 
     public GameData addGame(String gameName) {
+        ChessGame initialGame = new ChessGame();
+        String gameJson = gson.toJson(initialGame);
+
         var sql = "INSERT INTO games (gameName) VALUES (?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql, RETURN_GENERATED_KEYS)){
             ps.setString(1, gameName);
+            ps.setString(2, gameJson);
             ps.executeUpdate();
             try(var rs = ps.getGeneratedKeys()){
                 if(rs.next()){
                     int id = rs.getInt(1);
-                    return new GameData(id, gameName, null, null);
+                    return new GameData(id, gameName, null, null, initialGame);
                 }
             }
         }catch (SQLException e){
@@ -198,7 +203,18 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
                 if(rs.next()){
                     var whiteUsername = rs.getString("whiteUsername");
                     var blackUsername = rs.getString("blackUsername");
-                    return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername);
+                    var gameStateJson = rs.getString("gameState");
+                    ChessGame game = null;
+                    if (gameStateJson != null && !gameStateJson.isBlank()) {
+                        try{
+                            game = gson.fromJson(gameStateJson, ChessGame.class);
+                        } catch (Exception ex) {
+                            game = new ChessGame();
+                        }
+                    } else{
+                        game = new ChessGame();
+                    }
+                    return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game);
                 };
             }
         } catch (SQLException e) {
@@ -236,7 +252,18 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             while(rs.next()){
                 var whiteUsername = rs.getString("whiteUsername");
                 var blackUsername = rs.getString("blackUsername");
-                games.add(new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername));
+                var gameStateJson = rs.getString("gameState");
+                ChessGame game = null;
+                if (gameStateJson != null && !gameStateJson.isBlank()) {
+                    try{
+                        game = gson.fromJson(gameStateJson, ChessGame.class);
+                    }catch (Exception ex) {
+                        game = new ChessGame();
+                    }
+                }else{
+                    game = new ChessGame();
+                }
+                games.add(new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game));
             }
         }catch (SQLException e){
             throw new RuntimeException("Unable to retrieve games.", e);
@@ -246,5 +273,19 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         return games;
     }
 
+    public void updateGameState(int gameID, ChessGame game){
+        var sql = "UPDATE games SET gameState=? WHERE id=?";
+        try(var conn = DatabaseManager.getConnection();
+        var ps = conn.prepareStatement(sql)){
+            String json = gson.toJson(game);
+            ps.setString(1,json);
+            ps.setInt(2, gameID);
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to update game.", e);
+        }catch (DataAccessException e){
+            throw new RuntimeException(e);
+        }
+    }
 }
 

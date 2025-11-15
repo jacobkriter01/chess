@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 public record ListGamesResponse(List<GameHeader> games, String message) {
-    public record GameHeader(int gameID, String gameName, String white, String black) {
+    public record GameHeader(int gameID, String gameName, String whiteUsername, String blackUsername) {
     }
 }

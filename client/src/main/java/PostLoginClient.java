@@ -1,3 +1,4 @@
+import chess.ChessBoard;
 import client.ServerFacade;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
@@ -93,7 +94,7 @@ public class PostLoginClient {
 
             System.out.println("Joined game " + gameID +" as "+ color);
 
-            GamePlayClient gamePlayClient = new GamePlayClient(color);
+            GamePlayClient gamePlayClient = new GamePlayClient(color, new ChessBoard());
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
@@ -109,18 +110,18 @@ public class PostLoginClient {
         }
         try{
             int gameID = Integer.parseInt(parts[1]);
+            System.out.println("Obtained game " + gameID);
 
-            JoinGameRequest request = new JoinGameRequest(authToken, gameID, "WHITE");
-            JoinGameResponse response = server.joinGame(authToken, request);
+            var gameState = server.getGameState(authToken, gameID);
 
             System.out.println("Observing game: " + gameID);
 
-            GamePlayClient gamePlayClient = new GamePlayClient("WHITE");
+            GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board());
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
         }catch (ServiceException ex){
-            System.out.println("Whoops" + ex.getMessage());
+            System.out.println(ex.getMessage());
         }
     }
 
