@@ -54,7 +54,6 @@ public class GameService {
             throw new BadRequestException();
         }
 
-
         dataAccess.joinGame(gameID, username, color);
     }
 
@@ -65,5 +64,21 @@ public class GameService {
         }
 
         return dataAccess.getAllGames();
+    }
+
+    public GameData getGameState(String token, int gameID) throws ServiceException {
+        var auth = dataAccess.getAuthToken(token);
+        if(auth == null){
+            throw new UnauthorizedException();
+        }
+        GameData game = dataAccess.getGame(gameID);
+        if(game == null){
+            throw new BadRequestException();
+        }
+        return game;
+    }
+
+    public void saveGameState(int gameID, chess.ChessGame game) throws ServiceException {
+        dataAccess.updateGameState(gameID, game);
     }
 }

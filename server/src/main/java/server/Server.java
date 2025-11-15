@@ -2,13 +2,14 @@ package server;
 
 import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
-import datamodel.UserData;
+import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
 import service.UserService;
 import service.GameService;
 import exceptions.ServiceException;
+import chess.ChessGame;
 
 public class Server {
 
@@ -32,6 +33,7 @@ public class Server {
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
         server.get("/game", this::listGames);
+        server.get("/game/{id}", this::getGameState);
 
     }
 
@@ -153,6 +155,43 @@ public class Server {
         } catch (ServiceException ex){
             ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         } catch (Exception ex){
+            ctx.status(500).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }
+    }
+
+    public void getGameState(Context ctx){
+        var serializer = new Gson();
+        try{
+            var token = ctx.header("Authorization");
+            if(token == null || token.isEmpty()){
+                ctx.status(401).result("{ \"message\": \"Error: missing auth token\" }");
+                return;
+            }
+
+            String idParam = ctx.pathParam("id");
+            int id;
+            try{
+                id = Integer.parseInt(idParam);
+            }catch (NumberFormatException e){
+                ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+                return;
+            }
+
+            var gameData = gameService.getGameState(token, id);
+            var response = new java.util.HashMap<String, Object>();
+            response.put("gameID", gameData.getGameID());
+            response.put("whiteUsername", gameData.getWhiteUsername());
+            response.put("blackUsername", gameData.getBlackUsername());
+
+            ChessGame chessGame = gameData.getGame();
+            response.put("board", chessGame.getBoard());
+            response.put("turn", chessGame.getTeamTurn());
+            response.put("gameOver", false);
+
+            ctx.status(200).result(serializer.toJson(response));
+        }catch (ServiceException ex){
+            ctx.status(ex.getStatusCode()).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
+        }catch (Exception ex){
             ctx.status(500).result("{ \"message\": \"Error: " + ex.getMessage() + "\" }");
         }
     }
