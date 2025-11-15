@@ -269,20 +269,5 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
         }
         return games;
     }
-
-    public void updateGameState(int gameID, ChessGame game){
-        var sql = "UPDATE games SET gameState=? WHERE id=?";
-        try(var conn = DatabaseManager.getConnection();
-        var ps = conn.prepareStatement(sql)){
-            String json = gson.toJson(game);
-            ps.setString(1,json);
-            ps.setInt(2, gameID);
-            ps.executeUpdate();
-        }catch (SQLException e){
-            throw new RuntimeException("Unable to update game.", e);
-        }catch (DataAccessException e){
-            throw new RuntimeException(e);
-        }
-    }
 }
 
