@@ -1,11 +1,9 @@
 import java.util.Scanner;
 
-import datamodel.*;
+import client.ServerFacade;
 import exceptions.ServiceException;
 import requests.*;
 import responses.*;
-
-import static ui.EscapeSequences.*;
 
 public class PreLoginClient {
     private final ServerFacade server;
@@ -28,7 +26,12 @@ public class PreLoginClient {
 
             switch (command){
                 case "help" -> printHelp();
-                case "register" -> handleRegister(parts);
+                case "register" -> {
+                    String token = handleRegister(parts);
+                    if(token != null){
+                        return token;
+                    }
+                }
                 case "login" -> {
                     String token = handleLogin(parts);
                     if(token != null){
@@ -69,8 +72,8 @@ public class PreLoginClient {
             var request = new RegisterRequest(username, password, email);
             RegisterResponse response = server.register(request);
 
-            System.out.println("Logged in as " + response.username());
-            return response.authToken();
+            String[] newParts = {"login", username, password};
+            return handleLogin(newParts);
         } catch (ServiceException e) {
             System.err.println(e.getMessage());
             return null;

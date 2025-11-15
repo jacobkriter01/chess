@@ -1,6 +1,7 @@
+package client;
+
 import com.google.gson.Gson;
 import exceptions.ServiceException;
-import datamodel.UserData;
 import requests.*;
 import responses.*;
 

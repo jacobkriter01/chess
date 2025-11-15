@@ -1,6 +1,6 @@
+import client.ServerFacade;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
-import responses.*;
 import responses.*;
 import exceptions.ServiceException;
 
@@ -28,6 +28,7 @@ public class PostLoginClient {
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(authToken, parts);
                 case "join" -> joinGame(authToken, parts);
+                case "observe" -> observeGame(authToken, parts);
                 case "logout" -> {
                     logout(authToken);
                     return;
@@ -43,6 +44,7 @@ public class PostLoginClient {
                     - list
                     - create
                     - join
+                    - observe
                     - logout
                     """);
     }
@@ -92,6 +94,28 @@ public class PostLoginClient {
             System.out.println("Joined game " + gameID +" as "+ color);
 
             GamePlayClient gamePlayClient = new GamePlayClient(color);
+            gamePlayClient.run();
+        }catch (NumberFormatException ex){
+            System.out.println("Game ID must be a number");
+        }catch (ServiceException ex){
+            System.out.println("Whoops" + ex.getMessage());
+        }
+    }
+
+    private void observeGame(String authToken, String[] parts){
+        if (parts.length != 2){
+            System.out.println("Usage: observe <game ID>");
+            return;
+        }
+        try{
+            int gameID = Integer.parseInt(parts[1]);
+
+            JoinGameRequest request = new JoinGameRequest(authToken, gameID, "WHITE");
+            JoinGameResponse response = server.joinGame(authToken, request);
+
+            System.out.println("Observing game: " + gameID);
+
+            GamePlayClient gamePlayClient = new GamePlayClient("WHITE");
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");

@@ -1,18 +1,29 @@
 package client;
 
+import exceptions.ServiceException;
 import org.junit.jupiter.api.*;
 import server.Server;
+import client.ServerFacade;
+
+import requests.*;
+import responses.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
+    private static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+
+        String url = "http://localhost:" + port;
+        facade = new ServerFacade(url);
     }
 
     @AfterAll
@@ -20,10 +31,38 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    @BeforeEach
+    void resetDB() throws Exception {
+        facade.clearDb();
     }
 
+
+    @Test
+    public void registerPositive() throws Exception {
+        var request = new RegisterRequest("jacob", "pwd", "email");
+        var response = facade.register(request);
+
+        assertNotNull(response.authToken());
+    }
+
+    @Test
+    public void registerNegative() throws Exception {
+        var request = new RegisterRequest("jacob", "pwd", "email");
+        facade.register(request);
+
+        assertThrows(ServiceException.class, () -> facade.register(request));
+    }
+
+    @Test
+    public void loginPositive() throws Exception {
+        facade.register(new RegisterRequest("jacob", "pwd", "email"));
+        var response = facade.login(new LoginRequest("jacob", "pwd"));
+        assertNotNull(response.authToken());
+    }
+
+    @Test
+    public void loginNegative() throws Exception {
+        facade.register(new RegisterRequest("jacob", "pwd", "email"));
+        assertThrows(ServiceException.class, () -> facade.login(new LoginRequest("jacob", "wrong")));
+    }
 }
