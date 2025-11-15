@@ -4,6 +4,7 @@ import dataaccess.MySqlDataAccess;
 import datamodel.GameData;
 import datamodel.UserData;
 
+import exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
