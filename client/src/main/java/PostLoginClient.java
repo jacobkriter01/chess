@@ -52,7 +52,8 @@ public class PostLoginClient {
             ListGamesResponse response = server.listGames(authToken);
             System.out.println("Games:");
             for (var g : response.games()){
-                System.out.println("- " + g);
+                System.out.println("- " + g.gameId() + ": " + g.gameName()
+                + " (" + g.whiteUsername() + ", " + g.blackUsername() + ")");
             }
         }catch (ServiceException e){
             System.out.println(e.getMessage());

@@ -50,6 +50,7 @@ public class PreLoginClient {
                 Commands:
                 - register
                 - login
+                - help
                 - quit
                 """);
    }
@@ -66,7 +67,7 @@ public class PreLoginClient {
 
         try {
             var request = new RegisterRequest(username, password, email);
-            RegisterResponse response = server.register(request);
+            RegisterResponse response = server.registerDebug(request);
 
             System.out.println("Logged in as " + response.username());
             return response.authToken();
@@ -78,7 +79,7 @@ public class PreLoginClient {
 
    private String handleLogin(String[] parts){
        if (parts.length != 3){
-           System.out.println("Usage: register <username> <password>");
+           System.out.println("Usage: login <username> <password>");
            return null;
        }
 

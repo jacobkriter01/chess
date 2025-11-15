@@ -1,7 +1,8 @@
 package responses;
 
 import java.util.List;
-import java.util.Map;
 
-public record ListGamesResponse(List<Map<String, Object>> games, String message) {
+public record ListGamesResponse(List<GameHeader> games) {
+
+    public record GameHeader(int gameId, String gameName, String whiteUsername, String blackUsername) {}
 }

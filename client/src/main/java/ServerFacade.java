@@ -24,6 +24,25 @@ public class ServerFacade {
         return handleResponse(response, RegisterResponse.class);
     }
 
+    public RegisterResponse registerDebug(RegisterRequest user) throws ServiceException {
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(user);
+
+        System.out.println("==== Debug Register Request ====");
+        System.out.println("POST " + serverUrl + "/user");
+        System.out.println("Headers: Content-Type: application/json");
+        System.out.println("Body: " + jsonBody);
+        System.out.println("================================");
+
+        var request = buildRequest("POST", "/user", user, null);
+        var response = sendRequest(request);
+
+        System.out.println("Response status: " + response.statusCode());
+        System.out.println("Response body: " + response.body());
+
+        return handleResponse(response, RegisterResponse.class);
+    }
+
     public LoginResponse login(LoginRequest user) throws ServiceException {
         var request = buildRequest("POST", "/session", user, null);
         var response = sendRequest(request);
