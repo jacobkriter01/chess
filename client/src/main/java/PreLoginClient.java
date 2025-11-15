@@ -10,8 +10,9 @@ import static ui.EscapeSequences.*;
 public class PreLoginClient {
     private final ServerFacade server;
     private final Scanner scanner = new Scanner(System.in);
+    private final State state = State.POSTLOGIN;
 
-    public PreLoginClient(String url{
+    public PreLoginClient(String url){
         this.server = new ServerFacade(url);
     }
 
@@ -19,7 +20,7 @@ public class PreLoginClient {
         System.out.println("Welcome to 240 Chess. Type help to get started.");
 
         while (true){
-            System.out.print("> ");
+            System.out.print(state + ">>> ");
             String input = scanner.nextLine().trim().toLowerCase();
 
             String[] parts = input.split(" ");
