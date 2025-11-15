@@ -5,12 +5,15 @@ import requests.JoinGameRequest;
 import responses.*;
 import exceptions.ServiceException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PostLoginClient {
     private final ServerFacade server;
     private final Scanner scanner = new Scanner(System.in);
     private final State state = State.POSTLOGIN;
+    private final Map<Integer, Integer> fakeID = new HashMap<>();
 
     public PostLoginClient(String url) {
         this.server = new ServerFacade(url);
@@ -54,8 +57,10 @@ public class PostLoginClient {
         try{
             ListGamesResponse response = server.listGames(authToken);
             System.out.println("Games:");
+            fakeID.clear();
             for (var i = 1; i <= response.games().size(); i++){
                 var gameInfo = response.games().get(i-1);
+                fakeID.put(i, gameInfo.gameID());
                 System.out.println(i + "- " +  gameInfo.gameName() + "\tWHITE: " + gameInfo.whiteUsername() + "\tBLACK: " + gameInfo.blackUsername());
             }
         }catch (ServiceException e){
@@ -87,13 +92,19 @@ public class PostLoginClient {
         }
 
         try{
-            int gameID = Integer.parseInt(parts[1]);
+            int fake = Integer.parseInt(parts[1]);
+            var gameID = fakeID.get(fake);
+
+            if (gameID == null){
+                System.out.println("Game ID does not exist");
+                return;
+            }
             String color = parts[2].toLowerCase();
 
             JoinGameRequest request = new JoinGameRequest(authToken, gameID, color);
             server.joinGame(authToken, request);
 
-            System.out.println("Joined game " + gameID +" as "+ color);
+            System.out.println("Joined game " + fake +" as "+ color);
 
             GameStateResponse gameState = server.getGameState(authToken, gameID);
             ChessBoard serverBoard = gameState.board();
@@ -113,12 +124,18 @@ public class PostLoginClient {
             return;
         }
         try{
-            int gameID = Integer.parseInt(parts[1]);
+            int fake = Integer.parseInt(parts[1]);
+            var gameID = fakeID.get(fake);
+
+            if (gameID == null){
+                System.out.println("Game ID does not exist");
+                return;
+            }
             System.out.println("Obtained game " + gameID);
 
             var gameState = server.getGameState(authToken, gameID);
 
-            System.out.println("Observing game: " + gameID);
+            System.out.println("Observing game: " + fake);
 
             GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board());
             gamePlayClient.run();
