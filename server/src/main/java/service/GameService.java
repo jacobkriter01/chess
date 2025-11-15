@@ -1,6 +1,5 @@
 package service;
 
-import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;

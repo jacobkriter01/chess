@@ -5,16 +5,13 @@ import com.google.gson.Gson;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
 import datamodel.UserData;
-import exceptions.*;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 public class MySqlDataAccess implements DataAccess {
 

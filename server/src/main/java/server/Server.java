@@ -1,6 +1,5 @@
 package server;
 
-import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import datamodel.*;
 import io.javalin.*;

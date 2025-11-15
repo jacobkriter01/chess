@@ -3,10 +3,8 @@ package client;
 import exceptions.ServiceException;
 import org.junit.jupiter.api.*;
 import server.Server;
-import client.ServerFacade;
 
 import requests.*;
-import responses.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

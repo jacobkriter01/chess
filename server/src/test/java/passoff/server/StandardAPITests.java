@@ -1,7 +1,6 @@
 package passoff.server;
 
 import chess.ChessGame;
-import exceptions.ServiceException;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
 import server.Server;

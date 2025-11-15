@@ -1,5 +1,3 @@
-import chess.*;
-
 import exceptions.ServiceException;
 import server.Server;
 
