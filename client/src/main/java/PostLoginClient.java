@@ -90,11 +90,14 @@ public class PostLoginClient {
             String color = parts[2].toLowerCase();
 
             JoinGameRequest request = new JoinGameRequest(authToken, gameID, color);
-            JoinGameResponse response = server.joinGame(authToken, request);
+            server.joinGame(authToken, request);
 
             System.out.println("Joined game " + gameID +" as "+ color);
 
-            GamePlayClient gamePlayClient = new GamePlayClient(color, new ChessBoard());
+            GameStateResponse gameState = server.getGameState(authToken, gameID);
+            ChessBoard serverBoard = gameState.board();
+
+            GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
