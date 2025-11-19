@@ -1,5 +1,7 @@
 package websocket.commands;
 
+import chess.ChessMove;
+
 import java.util.Objects;
 
 /**
@@ -39,6 +41,14 @@ public class UserGameCommand {
 
     public Integer getGameID() {
         return gameID;
+    }
+
+    private ChessMove move;
+
+    public static UserGameCommand makeMove(String authToken, int gameID, ChessMove move) {
+        var cmd = new UserGameCommand(CommandType.MAKE_MOVE, authToken, gameID);
+        cmd.move = move;
+        return cmd;
     }
 
     @Override

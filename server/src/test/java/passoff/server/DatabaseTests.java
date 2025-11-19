@@ -1,4 +1,4 @@
-package passoff.passoff;
+package passoff.server;
 
 import chess.ChessGame;
 import exceptions.ServiceException;

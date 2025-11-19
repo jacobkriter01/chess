@@ -1,4 +1,4 @@
-package passoff.passoff.server;
+package passoff.server.server;
 
 import chess.*;
 import org.junit.jupiter.api.*;
