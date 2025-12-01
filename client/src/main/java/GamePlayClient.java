@@ -1,16 +1,32 @@
 import chess.*;
 import static ui.EscapeSequences.*;
 
-public class GamePlayClient {
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
+import client.websocket.WebSocketFacade;
+
+import java.util.Scanner;
+
+public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
     private final ChessBoard board;
     private final String playerColor;
+    private final String authToken;
+    private final int gameID;
+    private final WebSocketFacade ws;
 
-    public GamePlayClient(String playerColor, ChessBoard serverBoard) {
+    private final Scanner scanner = new Scanner(System.in);
+
+    public GamePlayClient(String playerColor, ChessBoard serverBoard, String authToken, int gameID, String serverUrl) {
         this.playerColor = playerColor.toUpperCase();
         this.board = serverBoard;
+        this.authToken = authToken;
+        this.gameID = gameID;
+        this.ws = new WebSocketFacade(serverUrl, this);
     }
 
     public void run(){
+        ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+
         ChessGame.TeamColor orientation;
         if(playerColor.equals("WHITE")){
             orientation = ChessGame.TeamColor.WHITE;
@@ -20,6 +36,29 @@ public class GamePlayClient {
             orientation = ChessGame.TeamColor.WHITE;
         }
         drawBoard(board, orientation);
+
+        gameLoop();
+    }
+
+    public void gameLoop(){
+        while(true){
+            System.out.print("\nCommands: help, redraw, highlight, move, resign, leave");
+            System.out.print(">>> ");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            switch(input){
+                case "help" -> printHelp();
+                case "redraw" -> redrawBoard();
+                case "highlight" -> highlightMoves();
+                case "move" -> makeMove();
+                case "resign" -> resign();
+                case "leave" -> {
+                    leave();
+                    return;
+                }
+                default -> System.out.println("Invalid input");
+            }
+        }
     }
 
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){

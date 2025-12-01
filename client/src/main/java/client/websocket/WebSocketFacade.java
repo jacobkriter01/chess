@@ -10,7 +10,7 @@ import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
 
 
-public class WebSocketFacade {
+public class WebSocketFacade implements WebSocket.Listener {
     private final Gson gson = new Gson();
     private WebSocket webSocket;
     private final GameMessageHandler handler;
@@ -35,7 +35,7 @@ public class WebSocketFacade {
     }
 
     @Override
-    public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last{
+    public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last){
         String json = data.toString();
         ServerMessage msg = gson.fromJson(json, ServerMessage.class);
 
@@ -46,5 +46,5 @@ public class WebSocketFacade {
         }
 
         return WebSocket.Listener.super.onText(ws, data, last);
-    })
+    }
 }
