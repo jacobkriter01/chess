@@ -73,7 +73,17 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
                 """);
     }
 
-    private void redrawBoard(){}
+    private void redrawBoard(){
+        ChessGame.TeamColor orientation;
+        if(playerColor.equals("WHITE")){
+            orientation = ChessGame.TeamColor.WHITE;
+        }else if(playerColor.equals("BLACK")){
+            orientation = ChessGame.TeamColor.BLACK;
+        }else{
+            orientation = ChessGame.TeamColor.WHITE;
+        }
+        drawBoard(board, orientation);
+    }
 
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){
         String header;
