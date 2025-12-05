@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
 import datamodel.UserData;
+import exceptions.ServiceException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
@@ -237,6 +238,21 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             throw new RuntimeException("Unable to join game.", e);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void updateGame(int gameID, chess.ChessGame game) throws ServiceException {
+        try(var conn = DatabaseManager.getConnection()){
+            String gameJson = new Gson().toJson(game);
+
+            String sql = "UPDATE games SET gameState=? WHERE id=?";
+            try (var ps = conn.prepareStatement(sql)){
+                ps.setString(1,gameJson);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to update game.", ex);
         }
     }
 

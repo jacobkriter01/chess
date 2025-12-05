@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.MySqlDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
@@ -75,5 +76,38 @@ public class GameService {
             throw new BadRequestException();
         }
         return game;
+    }
+
+    public void makeMove(String token, int gameID, chess.ChessMove move) throws ServiceException {
+        AuthTokenData auth = dataAccess.getAuthToken(token);
+        if (auth == null){
+            throw new UnauthorizedException();
+        }
+
+        GameData game = dataAccess.getGame(gameID);
+        if (game == null){
+            throw new BadRequestException();
+        }
+
+        var username = auth.username();
+
+        var chessGame = game.getGame();
+        var currentTeam = chessGame.getTeamTurn();
+
+        boolean isWhite = username.equals(game.getWhiteUsername());
+        boolean isBlack = username.equals(game.getBlackUsername());
+
+        if((currentTeam == ChessGame.TeamColor.WHITE && !isWhite) ||
+        (currentTeam == ChessGame.TeamColor.BLACK && !isBlack)){
+            throw new ServiceException(400, "It is not your turn.");
+        }
+
+        try{
+            chessGame.makeMove(move);
+        }catch (Exception ex){
+            throw new BadRequestException();
+        }
+
+        dataAccess.updateGame(gameID, chessGame);
     }
 }
