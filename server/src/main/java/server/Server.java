@@ -5,10 +5,14 @@ import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
+import io.javalin.websocket.WsContext;
 import service.UserService;
 import service.GameService;
 import exceptions.ServiceException;
 import chess.ChessGame;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 public class Server {
 
@@ -16,6 +20,9 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final MySqlDataAccess dataAccess;
+
+    private final Map<WsContext, Integer> clientGames = new ConcurrentHashMap<>();
+    private final Map<WsContext, String> clientTokens = new ConcurrentHashMap<>();
 
     public Server() {
         dataAccess = new MySqlDataAccess();
@@ -34,6 +41,73 @@ public class Server {
         server.get("/game", this::listGames);
         server.get("/game/{id}", this::getGameState);
 
+        server.ws("/connect", ws -> {
+            ws.onConnect(ctx ->{
+                System.out.println("WebSocket connected.");
+            });
+
+            ws.onMessage(ctx -> {
+                var cmd = new Gson().fromJson(ctx.message(), websocket.commands.UserGameCommand.class);
+                handleWsCommand(ctx, cmd);
+            });
+
+            ws.onClose(ctx -> {
+                clientGames.remove(ctx);
+                clientTokens.remove(ctx);
+                System.out.println("WebSocket closed.");
+            });
+        });
+    }
+
+    private void handleWsCommand(WsContext ctx, websocket.commands.UserGameCommand cmd) {
+        try{
+            String token = cmd.getAuthToken();
+            Integer gameID = cmd.getGameID();
+
+            switch(cmd.getCommandType()){
+                case CONNECT ->{
+                    clientTokens.put(ctx, token);
+                    clientGames.put(ctx, gameID);
+
+                    var state = gameService.getGameState(token, gameID);
+                    var msg = websocket.messages.ServerMessage.loadGame(state.getGame());
+                    ctx.send(new Gson().toJson(msg));
+                }
+
+                case MAKE_MOVE -> {
+                    gameService.makeMove(token, gameID, cmd.move);
+
+                    var state = gameService.getGameState(token, gameID);
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.loadGame(state.getGame()));
+                }
+
+                case LEAVE -> {
+                    clientGames.remove(ctx);
+                    clientTokens.remove(ctx);
+                    ctx.send(new Gson().toJson(websocket.messages.ServerMessage.notification("Player left the game.")));
+                }
+
+                case RESIGN -> {
+                    gameService.resign(token, gameID);
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification("Player resigned."));
+                }
+            }
+        } catch (Exception ex) {
+            var msg = websocket.messages.ServerMessage.error(ex.getMessage());
+            ctx.send(new Gson().toJson(msg));
+        }
+    }
+
+    private void broadcastToGame(int gameID, websocket.messages.ServerMessage msg) {
+        String json = new Gson().toJson(msg);
+
+        for (var entry : clientGames.entrySet()) {
+            WsContext ws = entry.getKey();
+            int g = entry.getValue();
+            if(g == gameID){
+                ws.send(json);
+            }
+        }
     }
 
     private void clearDatabase(Context ctx) {

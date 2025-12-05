@@ -76,14 +76,6 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
     }
 
     private void redrawBoard(){
-        ChessGame.TeamColor orientation;
-        if(playerColor.equals("WHITE")){
-            orientation = ChessGame.TeamColor.WHITE;
-        }else if(playerColor.equals("BLACK")){
-            orientation = ChessGame.TeamColor.BLACK;
-        }else{
-            orientation = ChessGame.TeamColor.WHITE;
-        }
         drawBoard(board, orientation);
     }
 
@@ -102,15 +94,14 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
             return;
         }
 
-        if(currentGame == null){
+        if(currentGame == null) {
             currentGame = new ChessGame();
-            currentGame.setBoard(board);
-        } else {
-            currentGame.setBoard(board);
         }
+        currentGame.setBoard(board);
+
 
         Collection<ChessMove> legal = currentGame.validMoves(pos);
-        if(legal.isEmpty()) {
+        if(legal.isEmpty() || legal == null) {
             System.out.println("No legal moves for that piece");
             return;
         }
@@ -119,7 +110,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         highlight[pos.getRow()-1][pos.getColumn()-1] = true;
         for (var move : legal) {
             var end = move.getEndPosition();
-            highlight[end.getRow()-1][end.getColumn()] = true;
+            highlight[end.getRow()-1][end.getColumn()-1] = true;
         }
 
         drawBoardHighlights(board, orientation, highlight);
@@ -127,7 +118,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
 
     private void makeMove(){
         System.out.print("Enter move (e.g., a2 a3): ");
-        String [] parts = scanner.nextLine().trim().split(" ");
+        String [] parts = scanner.nextLine().trim().split("\\s+");
         if (parts.length != 2){
             System.out.println("Invalid input");
             return;
@@ -165,7 +156,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         int col = file - 'a' + 1;
         int row = rank - '1' + 1;
 
-        return new ChessPosition(col, row);
+        return new ChessPosition(row, col);
     }
 
     private void resign(){
@@ -183,7 +174,15 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
 
     @Override
     public void onLoadGame(ServerMessage msg) {
-
+        if (msg == null){
+            return;
+        }
+        ChessGame game = msg.getGame();
+        if (game != null){
+            onLoadGame(game);
+        } else {
+            System.out.println("Game is not stored");
+        }
     }
 
     @Override
@@ -198,6 +197,9 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
 
     @Override
     public void onLoadGame(ChessGame updatedGame){
+        if (updatedGame == null){
+            return;
+        }
         this.currentGame = updatedGame;
         this.board = updatedGame.getBoard();
 

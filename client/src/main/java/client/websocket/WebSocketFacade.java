@@ -26,9 +26,16 @@ public class WebSocketFacade implements WebSocket.Listener {
 
     public WebSocketFacade(String serverUrl, GameMessageHandler handler) {
         this.handler = handler;
+
+        if (serverUrl.startsWith("http://")) {
+            serverUrl = serverUrl.replace("http://", "ws://");
+        }else if (serverUrl.startsWith("https://")) {
+            serverUrl = serverUrl.replace("https://", "wss://");
+        }
+
         this.webSocket = HttpClient.newHttpClient()
                 .newWebSocketBuilder()
-                .buildAsync(URI.create(serverUrl + "/ws"), this)
+                .buildAsync(URI.create(serverUrl + "/connect"), this)
                 .join();
     }
 
@@ -45,7 +52,7 @@ public class WebSocketFacade implements WebSocket.Listener {
         switch (msg.getServerMessageType()){
             case LOAD_GAME -> handler.onLoadGame(msg);
             case NOTIFICATION ->  handler.onNotification(msg.getMessage());
-            case ERROR -> handler.onError(msg.getMessage());
+            case ERROR -> handler.onError(msg.getErrorMessage());
         }
 
         return WebSocket.Listener.super.onText(ws, data, last);
