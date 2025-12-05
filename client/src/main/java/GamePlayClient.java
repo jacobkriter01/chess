@@ -28,6 +28,12 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         this.currentGame = new ChessGame();
         this.currentGame.setBoard(this.board);
 
+
+    }
+
+    public void run(){
+        ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+
         if(playerColor.equals("WHITE")){
             orientation = ChessGame.TeamColor.WHITE;
         }else if(playerColor.equals("BLACK")){
@@ -35,11 +41,6 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         }else{
             orientation = ChessGame.TeamColor.WHITE;
         }
-    }
-
-    public void run(){
-        ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
-
 
         drawBoard(board, orientation);
 

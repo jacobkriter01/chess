@@ -43,7 +43,11 @@ public class UserGameCommand {
         return gameID;
     }
 
-    private ChessMove move;
+    public ChessMove move;
+
+    public ChessMove getMove() {
+        return move;
+    }
 
     public static UserGameCommand makeMove(String authToken, int gameID, ChessMove move) {
         var cmd = new UserGameCommand(CommandType.MAKE_MOVE, authToken, gameID);

@@ -75,7 +75,7 @@ public class Server {
                 }
 
                 case MAKE_MOVE -> {
-                    gameService.makeMove(token, gameID, cmd.move);
+                    gameService.makeMove(token, gameID, cmd.getMove());
 
                     var state = gameService.getGameState(token, gameID);
                     broadcastToGame(gameID, websocket.messages.ServerMessage.loadGame(state.getGame()));
