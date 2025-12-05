@@ -14,12 +14,17 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor turn;
     private ArrayList<ChessMove> gameLog;
+    private boolean resigned = false;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.turn = TeamColor.WHITE;
         this.gameLog = new ArrayList<>();
+    }
+
+    public boolean getResigned() {
+        return resigned;
     }
 
     /**
@@ -242,6 +247,10 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public void setResigned(boolean value) {
+        this.resigned = value;
     }
 
     @Override

@@ -110,4 +110,26 @@ public class GameService {
 
         dataAccess.updateGame(gameID, chessGame);
     }
+
+    public void resign(String token, int gameID) throws ServiceException {
+        AuthTokenData auth = dataAccess.getAuthToken(token);
+        if (auth == null){
+            throw new UnauthorizedException();
+        }
+
+        GameData game = dataAccess.getGame(gameID);
+        if (game == null){
+            throw new BadRequestException();
+        }
+
+        var username = auth.username();
+
+        if(!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())){
+            throw new BadRequestException();
+        }
+
+        var chessGame = game.getGame();
+        chessGame.setResigned(true);
+        dataAccess.updateGame(gameID, chessGame);
+    }
 }
