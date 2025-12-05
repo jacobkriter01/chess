@@ -85,6 +85,55 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         drawBoard(board, orientation);
     }
 
+    private void highlightMoves(){
+
+    }
+
+    private void makeMove(){
+        System.out.print("Enter move (e.g., a2 a3): ");
+        String [] parts = scanner.nextLine().trim().split(" ");
+        if (parts.length != 2){
+            System.out.println("Invalid input");
+            return;
+        }
+
+        var start = parsePosition(parts[0]);
+        var end = parsePosition(parts[1]);
+
+        if(start == null || end == null){
+            System.out.println("Invalid coordinates");
+            return;
+        }
+
+        ChessMove move = new ChessMove(start, end, null);
+        UserGameCommand cmd = UserGameCommand.makeMove(authToken, gameID, move);
+        ws.send(cmd);
+    }
+
+    private ChessPosition parsePosition(String position){
+        position = position.trim().toLowerCase();
+        if(position.length() != 2){
+            return null;
+        }
+
+        char file = position.charAt(0);
+        char rank = position.charAt(1);
+
+        if(file < 'a' || file > 'h'){
+            return null;
+        }
+        if(rank < '1' || rank > '8'){
+            return null;
+        }
+
+        int col = file - 'a' + 1;
+        int row = rank - '1' + 1;
+
+        return new ChessPosition(col, row);
+    }
+
+
+
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){
         String header;
         if(ChessGame.TeamColor.WHITE == orientation){
