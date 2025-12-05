@@ -109,7 +109,7 @@ public class PostLoginClient {
             GameStateResponse gameState = server.getGameState(authToken, gameID);
             ChessBoard serverBoard = gameState.board();
 
-            GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard);
+            GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard, authToken, gameID, server.getServerUrl());
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
@@ -136,7 +136,7 @@ public class PostLoginClient {
 
             System.out.println("Observing game: " + fake);
 
-            GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board());
+            GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board(),  authToken, gameID, server.getServerUrl());
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");

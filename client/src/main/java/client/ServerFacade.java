@@ -120,4 +120,8 @@ public class ServerFacade {
             return "unknown error";
         }
     }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
 }
