@@ -2,14 +2,17 @@ import chess.*;
 import static ui.EscapeSequences.*;
 
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 import client.websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
-    private final ChessBoard board;
+    private ChessBoard board;
+    private ChessGame currentGame;
     private final String playerColor;
+    private ChessGame.TeamColor orientation;
     private final String authToken;
     private final int gameID;
     private final WebSocketFacade ws;
@@ -22,12 +25,9 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         this.authToken = authToken;
         this.gameID = gameID;
         this.ws = new WebSocketFacade(serverUrl, this);
-    }
+        this.currentGame = new ChessGame();
+        this.currentGame.setBoard(this.board);
 
-    public void run(){
-        ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
-
-        ChessGame.TeamColor orientation;
         if(playerColor.equals("WHITE")){
             orientation = ChessGame.TeamColor.WHITE;
         }else if(playerColor.equals("BLACK")){
@@ -35,12 +35,14 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         }else{
             orientation = ChessGame.TeamColor.WHITE;
         }
-        drawBoard(board, orientation);
-
-        gameLoop();
     }
 
-    public void gameLoop(){
+    public void run(){
+        ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+
+
+        drawBoard(board, orientation);
+
         while(true){
             System.out.print("\nCommands: help, redraw, highlight, move, resign, leave");
             System.out.print(">>> ");
@@ -86,7 +88,41 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
     }
 
     private void highlightMoves(){
+        System.out.println("Enter a piece to highlight (e.g, a3");
+        String input = scanner.nextLine().trim().toLowerCase();
+        ChessPosition pos = parsePosition(input);
+        if(pos == null){
+            System.out.println("Invalid coordinate");
+            return;
+        }
 
+        ChessPiece piece = board.getPiece(pos);
+        if(piece == null){
+            System.out.println("No piece at that position");
+            return;
+        }
+
+        if(currentGame == null){
+            currentGame = new ChessGame();
+            currentGame.setBoard(board);
+        } else {
+            currentGame.setBoard(board);
+        }
+
+        Collection<ChessMove> legal = currentGame.validMoves(pos);
+        if(legal.isEmpty()) {
+            System.out.println("No legal moves for that piece");
+            return;
+        }
+
+        boolean[][] highlight = new boolean[8][8];
+        highlight[pos.getRow()-1][pos.getColumn()-1] = true;
+        for (var move : legal) {
+            var end = move.getEndPosition();
+            highlight[end.getRow()-1][end.getColumn()] = true;
+        }
+
+        drawBoardHighlights(board, orientation, highlight);
     }
 
     private void makeMove(){
@@ -143,6 +179,29 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
     private void leave(){
         ws.send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
         System.out.println("You left.");
+    }
+
+    @Override
+    public void onLoadGame(ServerMessage msg) {
+
+    }
+
+    @Override
+    public void onNotification(String message) {
+        System.out.println("\n[NOTIFICATION] " + message);
+    }
+
+    @Override
+    public void onError(String error){
+        System.out.println("\n[ERROR] " + error);
+    }
+
+    @Override
+    public void onLoadGame(ChessGame updatedGame){
+        this.currentGame = updatedGame;
+        this.board = updatedGame.getBoard();
+
+        drawBoard(board, orientation);
     }
 
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){

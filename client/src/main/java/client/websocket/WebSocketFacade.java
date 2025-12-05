@@ -1,5 +1,6 @@
 package client.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -19,6 +20,8 @@ public class WebSocketFacade implements WebSocket.Listener {
         void onLoadGame(ServerMessage msg);
         void onNotification(String message);
         void onError(String error);
+
+        void onLoadGame(ChessGame updatedGame);
     }
 
     public WebSocketFacade(String serverUrl, GameMessageHandler handler) {
