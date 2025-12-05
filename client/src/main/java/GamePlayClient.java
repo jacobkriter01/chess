@@ -248,4 +248,56 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         System.out.println(header);
     }
 
+    private void drawBoardHighlights(ChessBoard board, ChessGame.TeamColor orientation, boolean[][] highlights){
+        String header;
+        if(ChessGame.TeamColor.WHITE == orientation){
+            header = "   a  b  c  d  e  f  g  h";
+        } else {
+            header =  "   h  g  f  e  d  c  b  a";
+        }
+        System.out.println(header);
+
+        for(int r = 0; r < 8; r++) {
+            int row = orientation == ChessGame.TeamColor.WHITE ? 7 - r : r;
+            System.out.print((row + 1) + " ");
+            for (int c = 0; c < 8; c++) {
+                int col = orientation == ChessGame.TeamColor.WHITE ? c : 7 - c;
+                ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
+                boolean isHighlighted = highlights[row][col];
+                String back;
+                if (isHighlighted) {
+                    back = SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    boolean lightSquare = (row + col) % 2 == 1;
+                    back = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+                }
+
+                String symbol;
+                if (piece == null) {
+                    symbol = EMPTY;
+                } else {
+                    switch (piece.getPieceType()) {
+                        case KING ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_KING : WHITE_KING;
+                        case QUEEN ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_QUEEN : WHITE_QUEEN;
+                        case BISHOP ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_BISHOP : WHITE_BISHOP;
+                        case ROOK ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_ROOK : WHITE_ROOK;
+                        case KNIGHT ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_KNIGHT : WHITE_KNIGHT;
+                        case PAWN ->
+                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_PAWN : WHITE_PAWN;
+                        default -> symbol = "?";
+                    }
+                }
+                System.out.print(back + symbol + RESET_BG_COLOR);
+            }
+            System.out.print(" " + (row + 1));
+            System.out.println();
+        }
+        System.out.println(header);
+    }
+
 }
