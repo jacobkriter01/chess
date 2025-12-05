@@ -132,7 +132,18 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         return new ChessPosition(col, row);
     }
 
+    private void resign(){
+        System.out.print("Confirm resign? (y/n): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("y")){
+            ws.send(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+            System.out.println("You resigned.");
+        }
+    }
 
+    private void leave(){
+        ws.send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
+        System.out.println("You left.");
+    }
 
     private void drawBoard(ChessBoard board, ChessGame.TeamColor orientation){
         String header;
