@@ -1,9 +1,10 @@
-package passoff.server;
+package passoff;
 
 import chess.ChessGame;
 import exceptions.ServiceException;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
+import passoff.server.TestServerFacade;
 import server.Server;
 
 import java.lang.reflect.Method;
