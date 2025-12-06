@@ -1,4 +1,4 @@
-package passoff.server.server;
+package server;
 
 import com.google.gson.GsonBuilder;
 
