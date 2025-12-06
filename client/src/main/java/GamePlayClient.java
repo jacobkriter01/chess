@@ -70,7 +70,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
     }
 
     private void highlightMoves(){
-        System.out.println("Enter a piece to highlight (e.g, a3");
+        System.out.println("Enter a piece to highlight (e.g, a3)");
         String input = scanner.nextLine().trim().toLowerCase();
         ChessPosition pos = parsePosition(input);
         if(pos == null){

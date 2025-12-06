@@ -14,7 +14,8 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor turn;
     private ArrayList<ChessMove> gameLog;
-    private boolean resigned = false;
+    private boolean gameOver = false;
+    private String winner;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -23,8 +24,17 @@ public class ChessGame {
         this.gameLog = new ArrayList<>();
     }
 
-    public boolean getResigned() {
-        return resigned;
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+    public String getWinner() {
+        return winner;
+    }
+    public void setWinner(String winner) {
+        this.winner = winner;
     }
 
     /**
@@ -94,6 +104,10 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //needs to make the move first then update teamColor
+        if(gameOver){
+            throw new InvalidMoveException();
+        }
+
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null) {
             throw new InvalidMoveException("No piece at start position");
@@ -247,10 +261,6 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
-    }
-
-    public void setResigned(boolean value) {
-        this.resigned = value;
     }
 
     @Override

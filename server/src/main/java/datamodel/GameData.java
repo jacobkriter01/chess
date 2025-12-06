@@ -11,7 +11,7 @@ public class GameData {
     private boolean gameOver;
     private String winner;
 
-    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername, ChessGame game) {
+    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername, ChessGame game, boolean gameOver, String winner) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;

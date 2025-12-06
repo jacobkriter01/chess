@@ -48,6 +48,8 @@ gameName VARCHAR(100) NOT NULL,
 whiteUsername VARCHAR(50),
 blackUsername VARCHAR(50),
 gameState TEXT,
+gameOver BOOLEAN DEFAULT FALSE,
+winner VARCHAR(50),
 FOREIGN KEY (whiteUsername) REFERENCES users(username),
 FOREIGN KEY (blackUsername) REFERENCES users(username))
 """};
@@ -182,7 +184,7 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             try(var rs = ps.getGeneratedKeys()){
                 if(rs.next()){
                     int id = rs.getInt(1);
-                    return new GameData(id, gameName, null, null, initialGame);
+                    return new GameData(id, gameName, null, null, initialGame, false, null);
                 }
             }
         }catch (SQLException e){
@@ -215,7 +217,9 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
                 } else{
                     game = new ChessGame();
                 }
-                return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game);
+                boolean gameOver = rs.getBoolean("gameOver");
+                String winner = rs.getString("winner");
+                return new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game, gameOver, winner);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Unable to retrieve game.", e);
@@ -277,7 +281,9 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
                 }else{
                     game = new ChessGame();
                 }
-                games.add(new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game));
+                boolean gameOver = rs.getBoolean("gameOver");
+                String winner = rs.getString("winner");
+                games.add(new GameData(rs.getInt("id"), rs.getString("gameName"), whiteUsername, blackUsername, game,  gameOver, winner));
             }
         }catch (SQLException e){
             throw new RuntimeException("Unable to retrieve games.", e);
@@ -297,6 +303,20 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             ps.executeUpdate();
         } catch (SQLException e){
             throw new RuntimeException("Unable to update player.", e);
+        }
+    }
+
+    public void setGameOver(int gameID, boolean gameOver, String winner) throws DataAccessException {
+        String sql = "UPDATE games SET gameOver=?, winner=? WHERE id=?";
+
+        try (var conn = DatabaseManager.getConnection();
+        var ps = conn.prepareStatement(sql)){
+            ps.setBoolean(1, gameOver);
+            ps.setString(2, winner);
+            ps.setInt(3, gameID);
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException("Unable to update game.", e);
         }
     }
 }

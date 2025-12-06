@@ -68,29 +68,48 @@ public class Server {
                 case CONNECT ->{
                     clientTokens.put(ctx, token);
                     clientGames.put(ctx, gameID);
-
                     var state = gameService.getGameState(token, gameID);
+                    String username = findUsername(token);
+                    String color = findColor(state, token);
+
+
                     var msg = websocket.messages.ServerMessage.loadGame(state.getGame());
                     ctx.send(new Gson().toJson(msg));
+
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(username + " joined the game as " + color));
+
+
                 }
 
                 case MAKE_MOVE -> {
                     gameService.makeMove(token, gameID, cmd.getMove());
 
                     var state = gameService.getGameState(token, gameID);
+                    ChessGame game = state.getGame();
+                    var turn = game.getTeamTurn();
+                    String username = findUsername(token);
                     broadcastToGame(gameID, websocket.messages.ServerMessage.loadGame(state.getGame()));
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(username + " moved: " + cmd.getMove()));
+
+                    if(game.isInCheck(turn)){
+                        broadcastToGame(gameID, websocket.messages.ServerMessage.notification(turn + " is in check"));
+                    }
+                    if(game.isInCheckmate(turn)){
+                        broadcastToGame(gameID, websocket.messages.ServerMessage.notification(turn + " is in checkmate"));
+                    }
                 }
 
                 case LEAVE -> {
                     clientGames.remove(ctx);
                     clientTokens.remove(ctx);
                     gameService.leaveGame(token, gameID);
-                    ctx.send(new Gson().toJson(websocket.messages.ServerMessage.notification("Player left the game.")));
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(findUsername(token) + " left the game."));
                 }
 
                 case RESIGN -> {
                     gameService.resign(token, gameID);
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification("Player resigned."));
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(findUsername(token) + " resigned."));
+                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(gameService.getGameState(token, gameID).getWinner() + " won the game!"));
                 }
             }
         } catch (Exception ex) {
@@ -277,5 +296,20 @@ public class Server {
 
     public void stop() {
         server.stop();
+    }
+
+    public String findUsername(String token){
+        return dataAccess.getAuthToken(token).username();
+    }
+
+    public String findColor(GameData game, String token){
+        String username  = findUsername(token);
+        if (username.equals(game.getWhiteUsername())){
+            return "white";
+        }
+        if (username.equals(game.getBlackUsername())){
+            return "black";
+        }
+        return "observer";
     }
 }

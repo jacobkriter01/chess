@@ -84,13 +84,8 @@ public class GameService {
         if (auth == null){
             throw new UnauthorizedException();
         }
-
-        if (getGameState(token, gameID).isGameOver()){
-            throw new BadRequestException();
-        }
-
-        GameData game = dataAccess.getGame(gameID);
-        if (game == null){
+        var game = dataAccess.getGame(gameID);
+        if (game.isGameOver()){
             throw new BadRequestException();
         }
 
@@ -116,18 +111,16 @@ public class GameService {
         dataAccess.updateGame(gameID, chessGame);
     }
 
-    public void resign(String token, int gameID) throws ServiceException {
-        var game = dataAccess.getGame(gameID);
+    public void resign(String token, int gameID) throws ServiceException, DataAccessException {
         AuthTokenData auth = dataAccess.getAuthToken(token);
-
         if (auth == null){
             throw new UnauthorizedException();
         }
 
+        var game = dataAccess.getGame(gameID);
         if (game == null){
             throw new BadRequestException();
         }
-
         if(game.isGameOver()){
             throw new ServiceException(400, "Game is over.");
         }
@@ -148,9 +141,14 @@ public class GameService {
         }
 
         game.setGameOver(true);
-        game.setWhiteUsername(winner);
+        game.setWinner(winner);
+
         var chessGame = game.getGame();
+        chessGame.setGameOver(true);
+        chessGame.setWinner(winner);
+
         dataAccess.updateGame(gameID, chessGame);
+        dataAccess.setGameOver(gameID, true, username);
     }
 
     public void leaveGame(String token, int gameID) throws ServiceException, DataAccessException {
