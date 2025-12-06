@@ -1,6 +1,7 @@
 import chess.*;
 import static ui.EscapeSequences.*;
 
+import datamodel.GameData;
 import websocket.commands.UserGameCommand;
 import client.websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
@@ -27,26 +28,14 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         this.ws = new WebSocketFacade(serverUrl, this);
         this.currentGame = new ChessGame();
         this.currentGame.setBoard(this.board);
-
-
     }
 
     public void run(){
         ws.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
 
-        if(playerColor.equals("WHITE")){
-            orientation = ChessGame.TeamColor.WHITE;
-        }else if(playerColor.equals("BLACK")){
-            orientation = ChessGame.TeamColor.BLACK;
-        }else{
-            orientation = ChessGame.TeamColor.WHITE;
-        }
-
-        drawBoard(board, orientation);
 
         while(true){
-            System.out.print("\nCommands: help, redraw, highlight, move, resign, leave");
-            System.out.print(">>> ");
+            printHelp();
             String input = scanner.nextLine().trim().toLowerCase();
 
             switch(input){
@@ -203,6 +192,15 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
         }
         this.currentGame = updatedGame;
         this.board = updatedGame.getBoard();
+
+        if(playerColor.equals("WHITE")){
+            orientation = ChessGame.TeamColor.WHITE;
+        }else if(playerColor.equals("BLACK")){
+            orientation = ChessGame.TeamColor.BLACK;
+        }else{
+            orientation = ChessGame.TeamColor.WHITE;
+        }
+
 
         drawBoard(board, orientation);
     }

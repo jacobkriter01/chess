@@ -8,6 +8,7 @@ import datamodel.UserData;
 import exceptions.ServiceException;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -284,6 +285,19 @@ FOREIGN KEY (blackUsername) REFERENCES users(username))
             throw new RuntimeException(e);
         }
         return games;
+    }
+
+    public void updatePlayers(int gameID, String white, String black) throws DataAccessException {
+        String sql = "UPDATE games SET whiteUsername=? , blackUsername=? WHERE id=?";
+        try (var conn = DatabaseManager.getConnection();
+        var ps = conn.prepareStatement((sql))){
+            ps.setString(1, white);
+            ps.setString(2, black);
+            ps.setInt(3, gameID);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Unable to update player.", e);
+        }
     }
 }
 

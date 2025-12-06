@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MySqlDataAccess;
 import datamodel.AuthTokenData;
 import datamodel.GameData;
@@ -84,6 +85,10 @@ public class GameService {
             throw new UnauthorizedException();
         }
 
+        if (getGameState(token, gameID).isGameOver()){
+            throw new BadRequestException();
+        }
+
         GameData game = dataAccess.getGame(gameID);
         if (game == null){
             throw new BadRequestException();
@@ -112,6 +117,43 @@ public class GameService {
     }
 
     public void resign(String token, int gameID) throws ServiceException {
+        var game = dataAccess.getGame(gameID);
+        AuthTokenData auth = dataAccess.getAuthToken(token);
+
+        if (auth == null){
+            throw new UnauthorizedException();
+        }
+
+        if (game == null){
+            throw new BadRequestException();
+        }
+
+        if(game.isGameOver()){
+            throw new ServiceException(400, "Game is over.");
+        }
+
+        String username = auth.username();
+
+        if(!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())){
+            throw new BadRequestException();
+        }
+
+        String winner;
+        if(username.equals(game.getWhiteUsername())){
+            winner = game.getBlackUsername();
+        }else if (username.equals(game.getBlackUsername())){
+            winner = game.getWhiteUsername();
+        }else{
+            throw new BadRequestException();
+        }
+
+        game.setGameOver(true);
+        game.setWhiteUsername(winner);
+        var chessGame = game.getGame();
+        dataAccess.updateGame(gameID, chessGame);
+    }
+
+    public void leaveGame(String token, int gameID) throws ServiceException, DataAccessException {
         AuthTokenData auth = dataAccess.getAuthToken(token);
         if (auth == null){
             throw new UnauthorizedException();
@@ -123,13 +165,20 @@ public class GameService {
         }
 
         var username = auth.username();
+        boolean changed = false;
 
-        if(!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())){
-            throw new BadRequestException();
+        if(username.equals(game.getWhiteUsername())){
+            dataAccess.updatePlayers(gameID, null, game.getBlackUsername());
+            changed = true;
         }
 
-        var chessGame = game.getGame();
-        chessGame.setResigned(true);
-        dataAccess.updateGame(gameID, chessGame);
+        if(username.equals(game.getBlackUsername())){
+            dataAccess.updatePlayers(gameID, game.getWhiteUsername(), null);
+            changed = true;
+        }
+
+        if(!changed){
+            throw new BadRequestException();
+        }
     }
 }

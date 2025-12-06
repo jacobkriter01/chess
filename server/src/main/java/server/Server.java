@@ -84,6 +84,7 @@ public class Server {
                 case LEAVE -> {
                     clientGames.remove(ctx);
                     clientTokens.remove(ctx);
+                    gameService.leaveGame(token, gameID);
                     ctx.send(new Gson().toJson(websocket.messages.ServerMessage.notification("Player left the game.")));
                 }
 
