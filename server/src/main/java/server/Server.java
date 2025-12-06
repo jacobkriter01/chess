@@ -310,6 +310,6 @@ public class Server {
         if (username.equals(game.getBlackUsername())){
             return "black";
         }
-        return "observer";
+        return "an observer";
     }
 }
