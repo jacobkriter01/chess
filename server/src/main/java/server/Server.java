@@ -10,7 +10,10 @@ import service.UserService;
 import service.GameService;
 import exceptions.ServiceException;
 import chess.ChessGame;
+import websocket.messages.ServerMessage;
+import com.google.gson.Gson;
 
+import java.net.http.WebSocket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
@@ -20,6 +23,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final MySqlDataAccess dataAccess;
+    private final Gson gson =  new Gson();
 
     private final Map<WsContext, Integer> clientGames = new ConcurrentHashMap<>();
     private final Map<WsContext, String> clientTokens = new ConcurrentHashMap<>();
@@ -41,7 +45,7 @@ public class Server {
         server.get("/game", this::listGames);
         server.get("/game/{id}", this::getGameState);
 
-        server.ws("/connect", ws -> {
+        server.ws("/ws", ws -> {
             ws.onConnect(ctx ->{
                 System.out.println("WebSocket connected.");
             });
@@ -57,6 +61,8 @@ public class Server {
                 System.out.println("WebSocket closed.");
             });
         });
+        System.out.println("WebSocket endpoint /connect initialized");
+
     }
 
     private void handleWsCommand(WsContext ctx, websocket.commands.UserGameCommand cmd) {
@@ -76,7 +82,7 @@ public class Server {
                     var msg = websocket.messages.ServerMessage.loadGame(state.getGame());
                     ctx.send(new Gson().toJson(msg));
 
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(username + " joined the game as " + color));
+                    broadcastToOthers(gameID, ctx, ServerMessage.notification(username + " joined the game as " + color));
 
 
                 }
@@ -88,14 +94,15 @@ public class Server {
                     ChessGame game = state.getGame();
                     var turn = game.getTeamTurn();
                     String username = findUsername(token);
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.loadGame(state.getGame()));
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(username + " moved: " + cmd.getMove()));
+                    broadcastToOthers(gameID, ctx, ServerMessage.notification(username + " moved: " + cmd.getMove()));
+                    broadcastToGame(gameID, ServerMessage.loadGame(state.getGame()));
+
 
                     if(game.isInCheck(turn)){
-                        broadcastToGame(gameID, websocket.messages.ServerMessage.notification(turn + " is in check"));
+                        broadcastToGame(gameID, ServerMessage.notification(turn + " is in check"));
                     }
                     if(game.isInCheckmate(turn)){
-                        broadcastToGame(gameID, websocket.messages.ServerMessage.notification(turn + " is in checkmate"));
+                        broadcastToGame(gameID, ServerMessage.notification(turn + " is in checkmate"));
                     }
                 }
 
@@ -103,13 +110,12 @@ public class Server {
                     clientGames.remove(ctx);
                     clientTokens.remove(ctx);
                     gameService.leaveGame(token, gameID);
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(findUsername(token) + " left the game."));
+                    broadcastToGame(gameID, ServerMessage.notification(findUsername(token) + " left the game."));
                 }
 
                 case RESIGN -> {
                     gameService.resign(token, gameID);
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(findUsername(token) + " resigned."));
-                    broadcastToGame(gameID, websocket.messages.ServerMessage.notification(gameService.getGameState(token, gameID).getWinner() + " won the game!"));
+                    broadcastToGame(gameID, ServerMessage.notification(findUsername(token) + " resigned." + gameService.getGameState(token, gameID).getWinner() + " won the game!"));
                 }
             }
         } catch (Exception ex) {
@@ -311,5 +317,18 @@ public class Server {
             return "black";
         }
         return "an observer";
+    }
+
+    private void broadcastToOthers(int gameID, WsContext except, ServerMessage msg){
+        String json = gson.toJson(msg);
+
+        for(var entry : clientGames.entrySet()){
+            WsContext session = entry.getKey();
+            int id =  entry.getValue();
+
+            if (id == gameID && !session.equals(except)){
+                session.send(json);
+            }
+        }
     }
 }

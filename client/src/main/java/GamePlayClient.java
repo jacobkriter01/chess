@@ -91,7 +91,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
 
 
         Collection<ChessMove> legal = currentGame.validMoves(pos);
-        if(legal.isEmpty() || legal == null) {
+        if(legal == null || legal.isEmpty()) {
             System.out.println("No legal moves for that piece");
             return;
         }
