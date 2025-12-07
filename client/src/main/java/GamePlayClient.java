@@ -226,26 +226,30 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
                 boolean lightSquare = (row + col) % 2 == 1;
                 String bg = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
 
-                String symbol;
-                if (piece == null) {
-                    symbol = EMPTY;
-                }else{
-                    switch(piece.getPieceType()){
-                        case KING -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KING : WHITE_KING;
-                        case QUEEN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_QUEEN : WHITE_QUEEN;
-                        case BISHOP -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_BISHOP : WHITE_BISHOP;
-                        case ROOK -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_ROOK : WHITE_ROOK;
-                        case KNIGHT -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KNIGHT : WHITE_KNIGHT;
-                        case PAWN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_PAWN : WHITE_PAWN;
-                        default -> symbol = "?";
-                    }
-                }
-                System.out.print(bg + symbol + RESET_BG_COLOR);
+                drawPieces(piece, bg);
             }
             System.out.print(" " + (row + 1));
             System.out.println();
         }
         System.out.println(header);
+    }
+
+    private void drawPieces(ChessPiece piece, String bg) {
+        String symbol;
+        if (piece == null) {
+            symbol = EMPTY;
+        }else{
+            switch(piece.getPieceType()){
+                case KING -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KING : WHITE_KING;
+                case QUEEN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_QUEEN : WHITE_QUEEN;
+                case BISHOP -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_BISHOP : WHITE_BISHOP;
+                case ROOK -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_ROOK : WHITE_ROOK;
+                case KNIGHT -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_KNIGHT : WHITE_KNIGHT;
+                case PAWN -> symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?  BLACK_PAWN : WHITE_PAWN;
+                default -> symbol = "?";
+            }
+        }
+        System.out.print(bg + symbol + RESET_BG_COLOR);
     }
 
     private void drawBoardHighlights(ChessBoard board, ChessGame.TeamColor orientation, boolean[][] highlights){
@@ -272,27 +276,7 @@ public class GamePlayClient implements WebSocketFacade.GameMessageHandler{
                     back = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
                 }
 
-                String symbol;
-                if (piece == null) {
-                    symbol = EMPTY;
-                } else {
-                    switch (piece.getPieceType()) {
-                        case KING ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_KING : WHITE_KING;
-                        case QUEEN ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_QUEEN : WHITE_QUEEN;
-                        case BISHOP ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_BISHOP : WHITE_BISHOP;
-                        case ROOK ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_ROOK : WHITE_ROOK;
-                        case KNIGHT ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_KNIGHT : WHITE_KNIGHT;
-                        case PAWN ->
-                                symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? BLACK_PAWN : WHITE_PAWN;
-                        default -> symbol = "?";
-                    }
-                }
-                System.out.print(back + symbol + RESET_BG_COLOR);
+                drawPieces(piece, back);
             }
             System.out.print(" " + (row + 1));
             System.out.println();
