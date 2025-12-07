@@ -17,8 +17,8 @@ public class GameData {
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
         this.game = (game != null) ? game : new ChessGame();
-        this.gameOver = false;
-        this.winner = null;
+        this.gameOver = gameOver;
+        this.winner = winner;
     }
 
     public int getGameID(){

@@ -15,6 +15,7 @@ public class WebSocketFacade implements WebSocket.Listener {
     private final Gson gson = new Gson();
     private WebSocket webSocket;
     private final GameMessageHandler handler;
+    private boolean gameIsOver = false;
 
     public interface GameMessageHandler {
         void onLoadGame(ServerMessage msg);
@@ -40,6 +41,11 @@ public class WebSocketFacade implements WebSocket.Listener {
     }
 
     public void send(UserGameCommand command) {
+        if (gameIsOver && command.getCommandType().equals("RESIGN")){
+            handler.onError("The game is over.");
+            return;
+        }
+
         String json = gson.toJson(command);
         webSocket.sendText(json, true);
     }
@@ -51,7 +57,15 @@ public class WebSocketFacade implements WebSocket.Listener {
 
         switch (msg.getServerMessageType()){
             case LOAD_GAME -> handler.onLoadGame(msg);
-            case NOTIFICATION ->  handler.onNotification(msg.getMessage());
+            case NOTIFICATION ->  {
+                handler.onNotification(msg.getMessage());
+
+                if (msg.getMessage().toLowerCase().contains("game over")
+                || msg.getMessage().toLowerCase().contains("won the game!")
+                || msg.getMessage().toLowerCase().contains("resigned")) {
+                    gameIsOver = true;
+                }
+            }
             case ERROR -> handler.onError(msg.getErrorMessage());
         }
 
