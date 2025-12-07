@@ -2,9 +2,11 @@ package server;
 
 import dataaccess.MySqlDataAccess;
 import datamodel.*;
+import exceptions.BadRequestException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.websocket.WsContext;
 import service.UserService;
 import service.GameService;
@@ -14,6 +16,7 @@ import websocket.messages.ServerMessage;
 import com.google.gson.Gson;
 
 import java.net.http.WebSocket;
+import java.rmi.ServerException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
@@ -97,25 +100,32 @@ public class Server {
                     broadcastToOthers(gameID, ctx, ServerMessage.notification(username + " moved: " + cmd.getMove()));
                     broadcastToGame(gameID, ServerMessage.loadGame(state.getGame()));
 
-
-                    if(game.isInCheck(turn)){
-                        broadcastToGame(gameID, ServerMessage.notification(turn + " is in check"));
-                    }
                     if(game.isInCheckmate(turn)){
                         broadcastToGame(gameID, ServerMessage.notification(turn + " is in checkmate"));
+                    }else if(game.isInCheck(turn)){
+                        broadcastToGame(gameID, ServerMessage.notification(turn + " is in check"));
                     }
+
                 }
 
                 case LEAVE -> {
+                    broadcastToOthers(gameID, ctx, ServerMessage.notification(findUsername(token) + " left the game."));
                     clientGames.remove(ctx);
                     clientTokens.remove(ctx);
                     gameService.leaveGame(token, gameID);
-                    broadcastToGame(gameID, ServerMessage.notification(findUsername(token) + " left the game."));
                 }
 
                 case RESIGN -> {
-                    gameService.resign(token, gameID);
-                    broadcastToGame(gameID, ServerMessage.notification(findUsername(token) + " resigned." + gameService.getGameState(token, gameID).getWinner() + " won the game!"));
+                    try{
+                        gameService.resign(token, gameID);
+                        String username = findUsername(token);
+                        String winner = gameService.getGameState(token, gameID).getWinner();
+                        broadcastToGame(gameID, ServerMessage.notification(username + " resigned. " + winner + " won the game!"));
+                    } catch (ServiceException e){
+                        ctx.send(ServerMessage.error(e.getMessage()));
+                    }
+
+
                 }
             }
         } catch (Exception ex) {

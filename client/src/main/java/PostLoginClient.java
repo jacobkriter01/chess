@@ -1,9 +1,11 @@
 import chess.ChessBoard;
 import client.ServerFacade;
+import client.websocket.WebSocketFacade;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import responses.*;
 import exceptions.ServiceException;
+import websocket.messages.ServerMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +111,8 @@ public class PostLoginClient {
             GameStateResponse gameState = server.getGameState(authToken, gameID);
             ChessBoard serverBoard = gameState.board();
 
-            GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard, authToken, gameID, server.getServerUrl());
+            String wsUrl = server.getServerUrl().replace("http","ws") +"/ws";
+            GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard, authToken, gameID, wsUrl);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");
@@ -136,7 +139,8 @@ public class PostLoginClient {
 
             System.out.println("Observing game: " + fake);
 
-            GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board(),  authToken, gameID, server.getServerUrl());
+            String wsUrl = server.getServerUrl().replace("http","ws") +"/ws";
+            GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board(),  authToken, gameID, wsUrl);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
             System.out.println("Game ID must be a number");

@@ -35,7 +35,7 @@ public class WebSocketFacade implements WebSocket.Listener {
 
         this.webSocket = HttpClient.newHttpClient()
                 .newWebSocketBuilder()
-                .buildAsync(URI.create(serverUrl + "/connect"), this)
+                .buildAsync(URI.create(serverUrl + "/ws"), this)
                 .join();
     }
 

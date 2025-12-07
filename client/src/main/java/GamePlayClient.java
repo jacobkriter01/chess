@@ -1,7 +1,6 @@
 import chess.*;
 import static ui.EscapeSequences.*;
 
-import datamodel.GameData;
 import websocket.commands.UserGameCommand;
 import client.websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
