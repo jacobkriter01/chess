@@ -111,7 +111,7 @@ public class PostLoginClient {
             GameStateResponse gameState = server.getGameState(authToken, gameID);
             ChessBoard serverBoard = gameState.board();
 
-            String wsUrl = server.getServerUrl().replace("http","ws") +"/ws";
+            String wsUrl = server.getServerUrl().replace("http","ws");
             GamePlayClient gamePlayClient = new GamePlayClient(color, serverBoard, authToken, gameID, wsUrl);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
@@ -139,7 +139,7 @@ public class PostLoginClient {
 
             System.out.println("Observing game: " + fake);
 
-            String wsUrl = server.getServerUrl().replace("http","ws") +"/ws";
+            String wsUrl = server.getServerUrl().replace("http","ws");
             GamePlayClient gamePlayClient = new GamePlayClient("OBSERVER", gameState.board(),  authToken, gameID, wsUrl);
             gamePlayClient.run();
         }catch (NumberFormatException ex){
